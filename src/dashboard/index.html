@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Abuse Detection Engine — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: #1a2332;
+      --bg-card-hover: #1e2a3a;
+      --border: #2a3a4e;
+      --text-primary: #e8edf5;
+      --text-secondary: #8b98ab;
+      --text-muted: #5a6577;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-orange: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --glass: rgba(26, 35, 50, 0.85);
+      --glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+      --glow-red: 0 0 20px rgba(239, 68, 68, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .header h1 span {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-stat {
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-stat .value { font-weight: 600; color: var(--accent-cyan); }
+
+    /* ── Alert Banner ────────────────────────────────────── */
+    .alert-banner {
+      display: none;
+      background: linear-gradient(90deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
+      border-bottom: 1px solid rgba(239,68,68,0.3);
+      padding: 10px 32px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent-red);
+      animation: slideDown 0.3s ease;
+    }
+
+    .alert-banner.show { display: flex; align-items: center; gap: 8px; }
+    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
+    /* ── Main Layout ─────────────────────────────────────── */
+    .main {
+      padding: 24px 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Stat Cards ──────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-blue);
+      box-shadow: var(--glow-blue);
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -1px;
+    }
+
+    .stat-card .delta {
+      font-size: 11px;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    .stat-card.danger .value { color: var(--accent-red); }
+    .stat-card.success .value { color: var(--accent-green); }
+    .stat-card.warning .value { color: var(--accent-orange); }
+    .stat-card.info .value { color: var(--accent-blue); }
+    .stat-card.purple .value { color: var(--accent-purple); }
+
+    /* ── Chart Grid ──────────────────────────────────────── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 260px;
+    }
+
+    /* ── Tables ──────────────────────────────────────────── */
+    .tables-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-scroll {
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      padding: 10px 16px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      font-size: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(42, 58, 78, 0.5);
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+    }
+
+    tr:hover td { background: rgba(59, 130, 246, 0.04); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-block { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+    .badge-throttle { background: rgba(245,158,11,0.15); color: var(--accent-orange); }
+    .badge-monitor { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+    .badge-allow { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+
+    /* ── Event Log ───────────────────────────────────────── */
+    .event-log {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .event-log h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-log-entries {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .event-entry {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .event-entry:hover { background: rgba(59, 130, 246, 0.05); }
+    .event-entry .ts { color: var(--text-muted); }
+    .event-entry.block { color: var(--accent-red); background: rgba(239,68,68,0.05); }
+    .event-entry.throttle { color: var(--accent-orange); }
+    .event-entry.alert { color: var(--accent-red); font-weight: 600; }
+
+    .scroll-bottom { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .charts-grid, .tables-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>🛡️ <span>API Abuse Detection Engine</span></h1>
+      <div class="status-badge" id="statusBadge">
+        <div class="status-dot"></div>
+        <span id="statusText">Connecting...</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-stat">ML: <span class="value" id="mlStatus">—</span></div>
+      <div class="header-stat">Hindsight: <span class="value" id="hsStatus">—</span></div>
+      <div class="header-stat">Uptime: <span class="value" id="uptime">0s</span></div>
+    </div>
+  </div>
+
+  <!-- Alert Banner -->
+  <div class="alert-banner" id="alertBanner">
+    <span>🚨</span>
+    <span id="alertText">Alert text here</span>
+  </div>
+
+  <div class="main">
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card info">
+        <div class="label">Total Requests</div>
+        <div class="value" id="totalRequests">0</div>
+        <div class="delta" id="totalRequestsDelta">—</div>
+      </div>
+      <div class="stat-card success">
+        <div class="label">Allowed</div>
+        <div class="value" id="allowedCount">0</div>
+        <div class="delta" id="allowedPct">—</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="label">Blocked</div>
+        <div class="value" id="blockedCount">0</div>
+        <div class="delta" id="blockedPct">—</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="label">Blocked IPs</div>
+        <div class="value" id="blockedIPs">0</div>
+        <div class="delta" id="blockedIPsDelta">—</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">Active Actors</div>
+        <div class="value" id="activeActors">0</div>
+        <div class="delta" id="activeActorsDelta">—</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>📈 Request Traffic (Last 60s)</h3>
+        <div class="chart-container">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>🥧 Enforcement Breakdown</h3>
+        <div class="chart-container">
+          <canvas id="enforcementChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tables -->
+    <div class="tables-grid">
+      <div class="table-card">
+        <h3>🚫 Blocked IPs</h3>
+        <div class="table-scroll" id="blockedIPsTable">
+          <table>
+            <thead><tr><th>IP Address</th><th>Actor</th><th>Reason</th><th>Score</th><th>Expires</th></tr></thead>
+            <tbody id="blockedIPsBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="table-card">
+        <h3>👥 Active Actors</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Actor ID</th><th>Requests</th><th>ML Score</th><th>Action</th></tr></thead>
+            <tbody id="actorsBody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No actors yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Event Log -->
+    <div class="event-log">
+      <h3>
+        <span>📡 Live Event Stream</span>
+        <button onclick="clearLog()" style="background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px">Clear</button>
+      </h3>
+      <div class="event-log-entries scroll-bottom" id="eventLog"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── State ─────────────────────────────────────────────
+    const state = {
+      totalRequests: 0,
+      allowed: 0,
+      blocked: 0,
+      throttled: 0,
+      monitored: 0,
+      actors: new Map(),       // actorId → { requests, lastMl, lastAction, ips }
+      blockedIPs: new Map(),   // ip → entry
+      trafficData: [],         // { time, allowed, blocked }
+      events: [],
+      startTime: Date.now(),
+    };
+
+    // Track traffic per second for the graph
+    const trafficBuckets = new Map(); // timestamp_seconds → { allowed, blocked, total }
+
+    // ── Charts ─────────────────────────────────────────────
+    const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+    const enforcementCtx = document.getElementById('enforcementChart').getContext('2d');
+
+    const trafficChart = new Chart(trafficCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Allowed',
+            data: [],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            borderWidth: 2,
+          },
+          {
+            label: 'Blocked',
+            data: [],
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: { color: 'rgba(42,58,78,0.3)' },
+            ticks: { color: '#5a6577', font: { size: 10 }, maxTicksLimit: 10 },
+          },
+          y: {
+            grid: { color: 'rgba(42,58,78,0.3)' },
+            ticks: { color: '#5a6577', font: { size: 10 } },
+            beginAtZero: true,
+          },
+        },
+        plugins: {
+          legend: { labels: { color: '#8b98ab', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
+        },
+        animation: { duration: 300 },
+      },
+    });
+
+    const enforcementChart = new Chart(enforcementCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Allowed', 'Blocked', 'Throttled', 'Monitored'],
+        datasets: [{
+          data: [1, 0, 0, 0],
+          backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#8b5cf6'],
+          borderColor: '#1a2332',
+          borderWidth: 3,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#8b98ab', font: { size: 11 }, padding: 12, usePointStyle: true } },
+        },
+        animation: { duration: 300 },
+      },
+    });
+
+    // ── WebSocket ───────────────────────────────────────────
+    let ws;
+    function connect() {
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${location.host}/ws`);
+
+      ws.onopen = () => {
+        document.getElementById('statusText').textContent = 'Connected';
+        document.getElementById('statusBadge').style.borderColor = 'rgba(16,185,129,0.3)';
+      };
+
+      ws.onclose = () => {
+        document.getElementById('statusText').textContent = 'Disconnected';
+        document.getElementById('statusBadge').style.borderColor = 'rgba(239,68,68,0.3)';
+        document.getElementById('statusBadge').style.background = 'rgba(239,68,68,0.1)';
+        document.querySelector('.status-dot').style.background = '#ef4444';
+        setTimeout(connect, 3000);
+      };
+
+      ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        if (data.type === 'history') {
+          data.events.forEach((e) => processEvent(e));
+        } else if (data.type === 'event') {
+          processEvent(data.event);
+        }
+      };
+    }
+
+    // ── Event Processing ─────────────────────────────────────
+    function processEvent(event) {
+      const now = Math.floor(Date.now() / 1000);
+
+      switch (event.type) {
+        case 'request':
+          state.totalRequests++;
+          state.allowed++;
+          trackActor(event.actorId, { requests: 1 });
+          addTrafficBucket(now, 'allowed');
+          break;
+
+        case 'enforcement':
+          if (event.action === 'block') {
+            state.blocked++;
+            state.allowed = Math.max(0, state.allowed - 1);
+            addTrafficBucket(now, 'blocked');
+            showAlert(`🚨 BLOCKED actor ${event.actorId.substring(0,8)}... (score: ${event.score})`);
+            pushNotification('IP Blocked', `Actor ${event.actorId.substring(0,8)} blocked with score ${event.score}`);
+          } else if (event.action === 'throttle') {
+            state.throttled++;
+          } else if (event.action === 'monitor') {
+            state.monitored++;
+          }
+          trackActor(event.actorId, { lastAction: event.action, lastScore: event.score });
+          break;
+
+        case 'ml_score':
+          trackActor(event.actorId, { lastMl: event.ml_risk_score, lastMlType: event.attack_type });
+          break;
+
+        case 'ip_blocked':
+          state.blockedIPs.set(event.ip, {
+            ip: event.ip,
+            actorId: event.actorId,
+            score: event.score,
+            time: new Date().toLocaleTimeString(),
+          });
+          break;
+
+        case 'assessment':
+          trackActor(event.actorId, {
+            lastScore: event.score,
+            classification: event.classification,
+            lastAction: event.action,
+          });
+          if (event.score >= 85) {
+            showAlert(`⚡ HIGH THREAT: ${event.actorId.substring(0,8)}... classified as ${event.classification} (score: ${event.score})`);
+          }
+          break;
+
+        case 'error':
+          appendLog(`❌ ${event.message}`, 'alert');
+          break;
+      }
+
+      // Log the event
+      if (event.type !== 'request') { // Skip individual requests to avoid spam
+        const ts = event.time ? new Date(event.time).toLocaleTimeString() : '';
+        let msg = formatEvent(event);
+        let cls = '';
+        if (event.type === 'enforcement' && event.action === 'block') cls = 'block';
+        if (event.type === 'enforcement' && event.action === 'throttle') cls = 'throttle';
+        appendLog(`<span class="ts">${ts}</span> ${msg}`, cls);
+      }
+
+      updateUI();
+    }
+
+    function trackActor(actorId, data) {
+      if (!state.actors.has(actorId)) {
+        state.actors.set(actorId, { id: actorId, requests: 0, lastMl: 0, lastAction: 'allow', ips: new Set() });
+      }
+      const actor = state.actors.get(actorId);
+      if (data.requests) actor.requests += data.requests;
+      if (data.lastMl !== undefined) actor.lastMl = data.lastMl;
+      if (data.lastAction) actor.lastAction = data.lastAction;
+      if (data.lastScore !== undefined) actor.lastScore = data.lastScore;
+      if (data.lastMlType) actor.lastMlType = data.lastMlType;
+      if (data.classification) actor.classification = data.classification;
+    }
+
+    function addTrafficBucket(ts, type) {
+      if (!trafficBuckets.has(ts)) trafficBuckets.set(ts, { allowed: 0, blocked: 0 });
+      trafficBuckets.get(ts)[type]++;
+    }
+
+    function formatEvent(e) {
+      switch (e.type) {
+        case 'enforcement':
+          const badge = e.action === 'block' ? '🚫 BLOCKED' : e.action === 'throttle' ? '⏳ THROTTLED' : e.action === 'monitor' ? '👁️ MONITOR' : '✅ ALLOW';
+          return `${badge} actor:${e.actorId?.substring(0,10)} score:${e.score} via:${e.source}`;
+        case 'ml_score':
+          const icon = e.ml_risk_score >= 60 ? '🔴' : e.ml_risk_score >= 30 ? '🟡' : '🟢';
+          return `🤖${icon} ML: ${e.ml_risk_score?.toFixed(1)} → ${e.attack_type} (${e.confidence}%)`;
+        case 'assessment':
+          return `🎯 Assessment: ${e.actorId?.substring(0,10)} → ${e.score}/100 ${e.classification} → ${e.action}`;
+        case 'recall':
+          return `🧠 Recall: ${e.actorId?.substring(0,10)} → ${e.found ? `FOUND (${e.count})` : 'not found'}`;
+        case 'retained':
+          return `💾 Retained session ${e.sessionId?.substring(0,12)} (${e.requestCount} reqs)`;
+        case 'ip_blocked':
+          return `🔒 IP BLOCKED: ${e.ip} (actor:${e.actorId?.substring(0,8)} score:${e.score})`;
+        case 'ml_session_score':
+          return `🤖 Session ML: ${e.ml_risk_score?.toFixed(1)} → ${e.attack_type} [${e.requestCount} reqs]`;
+        default:
+          return `${e.type}: ${JSON.stringify(e).substring(0, 80)}`;
+      }
+    }
+
+    // ── UI Updates ────────────────────────────────────────────
+    function updateUI() {
+      document.getElementById('totalRequests').textContent = state.totalRequests;
+      document.getElementById('allowedCount').textContent = state.allowed;
+      document.getElementById('blockedCount').textContent = state.blocked;
+      document.getElementById('blockedIPs').textContent = state.blockedIPs.size;
+      document.getElementById('activeActors').textContent = state.actors.size;
+
+      const total = state.totalRequests || 1;
+      document.getElementById('allowedPct').textContent = `${((state.allowed/total)*100).toFixed(1)}% allowed`;
+      document.getElementById('blockedPct').textContent = `${((state.blocked/total)*100).toFixed(1)}% block rate`;
+      document.getElementById('totalRequestsDelta').textContent = `${(state.totalRequests / Math.max(1, (Date.now() - state.startTime) / 1000)).toFixed(1)} req/s`;
+
+      // Enforcement chart
+      enforcementChart.data.datasets[0].data = [state.allowed, state.blocked, state.throttled, state.monitored];
+      enforcementChart.update('none');
+
+      // Traffic chart — show last 60 seconds
+      const now = Math.floor(Date.now() / 1000);
+      const labels = [];
+      const allowedData = [];
+      const blockedData = [];
+      for (let i = 59; i >= 0; i--) {
+        const ts = now - i;
+        const bucket = trafficBuckets.get(ts) || { allowed: 0, blocked: 0 };
+        labels.push(i === 0 ? 'now' : `-${i}s`);
+        allowedData.push(bucket.allowed);
+        blockedData.push(bucket.blocked);
+      }
+      trafficChart.data.labels = labels;
+      trafficChart.data.datasets[0].data = allowedData;
+      trafficChart.data.datasets[1].data = blockedData;
+      trafficChart.update('none');
+
+      // Blocked IPs table
+      updateBlockedIPsTable();
+      updateActorsTable();
+    }
+
+    function updateBlockedIPsTable() {
+      const body = document.getElementById('blockedIPsBody');
+      const entries = Array.from(state.blockedIPs.values());
+      if (entries.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr>';
+        return;
+      }
+      body.innerHTML = entries.map(e => `
+        <tr>
+          <td style="color:var(--accent-red)">${e.ip}</td>
+          <td>${e.actorId?.substring(0,10)}...</td>
+          <td>${e.reason || '—'}</td>
+          <td><span class="badge badge-block">${e.score}</span></td>
+          <td>${e.time}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateActorsTable() {
+      const body = document.getElementById('actorsBody');
+      const actors = Array.from(state.actors.values()).sort((a, b) => (b.lastMl || 0) - (a.lastMl || 0));
+      if (actors.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No actors yet</td></tr>';
+        return;
+      }
+      body.innerHTML = actors.slice(0, 20).map(a => {
+        const action = a.lastAction || 'allow';
+        const badgeCls = action === 'block' ? 'badge-block' : action === 'throttle' ? 'badge-throttle' : action === 'monitor' ? 'badge-monitor' : 'badge-allow';
+        return `
+          <tr>
+            <td>${a.id.substring(0,12)}...</td>
+            <td>${a.requests}</td>
+            <td style="color:${(a.lastMl||0) >= 60 ? 'var(--accent-red)' : (a.lastMl||0) >= 30 ? 'var(--accent-orange)' : 'var(--accent-green)'}">${(a.lastMl||0).toFixed(1)}</td>
+            <td><span class="badge ${badgeCls}">${action}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function appendLog(html, cls = '') {
+      const log = document.getElementById('eventLog');
+      const div = document.createElement('div');
+      div.className = `event-entry ${cls}`;
+      div.innerHTML = html;
+      log.appendChild(div);
+      if (log.children.length > 500) log.removeChild(log.firstChild);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('eventLog').innerHTML = '';
+    }
+
+    // ── Alerts ────────────────────────────────────────────────
+    function showAlert(text) {
+      const banner = document.getElementById('alertBanner');
+      document.getElementById('alertText').textContent = text;
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), 8000);
+    }
+
+    function pushNotification(title, body) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '🛡️' });
+      }
+    }
+
+    // Request notification permissions
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // ── Status polling ────────────────────────────────────────
+    async function pollStatus() {
+      try {
+        const [hs, ml] = await Promise.all([
+          fetch('/admin/hindsight/status').then(r => r.json()).catch(() => null),
+          fetch('/admin/ml/status').then(r => r.json()).catch(() => null),
+        ]);
+        document.getElementById('hsStatus').textContent = hs?.hindsight === 'connected' ? '✅' : '❌';
+        document.getElementById('mlStatus').textContent = ml?.model?.trained ? '✅' : '❌';
+      } catch {}
+    }
+
+    // ── Blocked IPs polling from server ───────────────────────
+    async function pollBlockedIPs() {
+      try {
+        const r = await fetch('/admin/blocked-ips').then(r => r.json()).catch(() => []);
+        if (Array.isArray(r)) {
+          r.forEach(entry => {
+            state.blockedIPs.set(entry.ip, entry);
+          });
+          document.getElementById('blockedIPs').textContent = state.blockedIPs.size;
+          updateBlockedIPsTable();
+        }
+      } catch {}
+    }
+
+    // ── Uptime ticker ─────────────────────────────────────────
+    setInterval(() => {
+      const s = Math.floor((Date.now() - state.startTime) / 1000);
+      const m = Math.floor(s / 60);
+      document.getElementById('uptime').textContent = m > 0 ? `${m}m ${s%60}s` : `${s}s`;
+    }, 1000);
+
+    // ── Init ──────────────────────────────────────────────────
+    connect();
+    pollStatus();
+    setInterval(pollStatus, 30000);
+    setInterval(pollBlockedIPs, 5000);
+    setInterval(updateUI, 1000);
+  </script>
+</body>
+</html>

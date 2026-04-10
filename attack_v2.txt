@@ -1,0 +1,107 @@
+Exception in thread Thread-2 (runner):
+Traceback (most recent call last):
+  File "C:\Users\Tanubhav Juneja\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "C:\Users\Tanubhav Juneja\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "D:\projects\Suta\test_server\attack_sim.py", line 455, in runner
+    fn(args.target, args.duration - d, t_id)
+  File "D:\projects\Suta\test_server\attack_sim.py", line 232, in data_scraper
+    ip_pool = random_ip_from_subnet("45.33.32", 5)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\Suta\test_server\attack_sim.py", line 62, in random_ip_from_subnet
+    parts[3] = str(random.randint(1, 254))
+    ~~~~~^^^
+IndexError: list assignment index out of range
+
+
+=================================================================
+  API Attack Simulator v2.0 (Threaded + IP Masking)
+  Target:    http://localhost:3000
+  Duration:  60s
+  Threads:   4 attack + 1 normal
+=================================================================
+
+  Target reachable (status: 200)
+
+  Launching threads...
+-----------------------------------------------------------------
+  [18:13:57.837] U [NormalUser] Starting -- consistent IP: 203.45.67.89, browser UA, authenticated
+  [18:13:59.839] B [Brute-2] Starting -- ultra-fast /login, new IP every 5 reqs
+  [18:14:00.839] X [CredStuff-0] Starting -- 20 masked IPs, rapid /login
+
+  [  5s] Total:    9 | Allowed:    9 | Blocked:   0 | Errors:   0
+
+  [18:14:04.839] E [Enum-3] Starting -- systematic /products/N scan, 8 IPs
+
+  [ 10s] Total:   14 | Allowed:   14 | Blocked:   0 | Errors:   0
+
+
+  [ 15s] Total:   14 | Allowed:   14 | Blocked:   0 | Errors:   0
+
+  [18:14:17.403] U [NormalUser] req #3 -> 200 (GET /api/products/5)
+
+  [ 20s] Total:   25 | Allowed:   23 | Blocked:   0 | Errors:   2
+
+
+  [ 25s] Total:   30 | Allowed:   27 | Blocked:   0 | Errors:   3
+
+
+  [ 30s] Total:   31 | Allowed:   28 | Blocked:   0 | Errors:   3
+
+
+  [ 35s] Total:   42 | Allowed:   37 | Blocked:   0 | Errors:   5
+
+  [18:14:37.610] U [NormalUser] req #6 -> 200 (GET /api/search?q=jacket)
+
+  [ 40s] Total:   48 | Allowed:   42 | Blocked:   0 | Errors:   6
+
+
+  [ 45s] Total:   48 | Allowed:   42 | Blocked:   0 | Errors:   6
+
+
+  [ 50s] Total:   57 | Allowed:   49 | Blocked:   0 | Errors:   8
+
+
+  [ 55s] Total:   63 | Allowed:   54 | Blocked:   0 | Errors:   9
+
+  [18:14:56.618] U [NormalUser] req #9 -> 200 (GET /api/users/42/profile)
+
+  [ 60s] Total:   66 | Allowed:   57 | Blocked:   0 | Errors:   9
+
+  [18:15:00.659] B [Brute-2] Done -- 20 brute force attempts
+
+  [ 65s] Total:   67 | Allowed:   57 | Blocked:   0 | Errors:  10
+
+  [18:15:03.177] X [CredStuff-0] Done -- 20 attempts across 20 IPs
+  [18:15:04.554] E [Enum-3] Done -- 20 items enumerated
+  [18:15:05.411] U [NormalUser] Done -- 9 requests, all should be allowed
+
+  [ 70s] Total:   69 | Allowed:   58 | Blocked:   0 | Errors:  11
+
+
+
+=================================================================
+  ATTACK SIMULATION REPORT
+=================================================================
+
+  Total Requests:  69
+  Allowed:         58
+  Blocked:         0
+  Throttled:       0
+  Errors:          11
+
+  Block Rate:      0.0%
+
+  Actor                    Sent  Allow  Block  Throt   Blk%
+  ---------------------- ------ ------ ------ ------ ------
+  Brute-2                    20     16      0      0   0.0%
+  CredStuff-0                20     16      0      0   0.0%
+  Enum-3                     20     17      0      0   0.0%
+  NormalUser                  9      9      0      0   0.0% <-- OK
+
+=================================================================
+  PASS: Normal user was never blocked
+  WARN: No attackers were blocked (engine may need tuning)
+=================================================================
+
