@@ -17,7 +17,7 @@ import memoryLayer from '../memory/memoryLayer.js';
 import { enforce, applyEnforcement } from '../enforcement/enforcer.js';
 import ipBlocklist from '../enforcement/ipBlocklist.js';
 import { extractFeatures, extractRequestFeatures } from '../ml/featureExtractor.js';
-import detector from '../ml/model.js';
+import trainingManager from '../ml/trainingManager.js';
 import eventLog from './eventLog.js';
 
 // ── Caches ───────────────────────────────────────────────────
@@ -99,7 +99,7 @@ export async function abuseDetectionPipeline(req, res, next) {
     let mlResult = null;
     try {
       const features = extractRequestFeatures(parsed, history);
-      mlResult = await detector.predict(features);
+      mlResult = await trainingManager.predict(features);
       if (mlResult.model_ready) {
         eventLog.log('ml_score', {
           actorId,
@@ -136,7 +136,7 @@ export async function abuseDetectionPipeline(req, res, next) {
     let sessionMlResult = mlResult;
     try {
       const sessionFeatures = extractFeatures(analysis);
-      sessionMlResult = await detector.predict(sessionFeatures);
+      sessionMlResult = await trainingManager.predict(sessionFeatures);
       eventLog.log('ml_session_score', {
         actorId,
         ml_risk_score: sessionMlResult.ml_risk_score,

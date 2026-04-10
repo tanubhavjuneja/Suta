@@ -6,7 +6,7 @@
 // All intelligence (score, classification, recommendation) comes
 // from Hindsight reflect(). This module just acts on it.
 // ═══════════════════════════════════════════════════════════════
-import config from '../config.js';
+import { config } from '../runtimeConfig.js';
 
 const { blockScore, throttleScore, monitorScore } = config.enforcement;
 

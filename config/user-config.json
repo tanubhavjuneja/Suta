@@ -1,0 +1,32 @@
+{
+  "port": 3000,
+  "hindsight": {
+    "baseUrl": "http://localhost:8888"
+  },
+  "enforcement": {
+    "blockScore": 85,
+    "throttleScore": 70,
+    "monitorScore": 40
+  },
+  "rulesFilePath": "",
+  "importedRules": [],
+  "ollamaEndpoint": "http://localhost:11434",
+  "ollamaModel": "llama3.2",
+  "training": {
+    "enabled": false,
+    "intervalHours": 1,
+    "useIncremental": true,
+    "enableRulesTrigger": false,
+    "rulesThreshold": 5,
+    "forceFullRetrainEvery": 24
+  },
+  "ollama": {
+    "autoAnalyze": false,
+    "analyzeIntervalMinutes": 30
+  },
+  "logging": {
+    "maxDays": 7,
+    "maxSizeMB": 100,
+    "chunkSizeMB": 4
+  }
+}
