@@ -5,6 +5,7 @@ import { parentPort } from 'worker_threads';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createDefaultConfig, mergeConfig } from '../configDefaults.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,8 @@ class DashboardWorker {
   constructor() {
     this.events = [];
     this.maxEvents = 1000;
+    this.requestId = 0;
+    this.pendingWorkerRequests = new Map();
     this.init();
   }
 
@@ -27,7 +30,7 @@ class DashboardWorker {
     const configPath = path.join(CONFIG_DIR, 'user-config.json');
     try {
       if (fs.existsSync(configPath)) {
-        this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        this.config = mergeConfig(JSON.parse(fs.readFileSync(configPath, 'utf8')));
       } else {
         this.config = this.getDefaultConfig();
         fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
@@ -39,40 +42,12 @@ class DashboardWorker {
   }
 
   getDefaultConfig() {
-    return {
-      port: 3000,
-      hindsight: { baseUrl: 'http://localhost:8888' },
-      enforcement: {
-        blockScore: 85,
-        throttleScore: 70,
-        monitorScore: 40,
-      },
-      rulesFilePath: '',
-      importedRules: [],
-      ollamaEndpoint: 'http://localhost:11434',
-      ollamaModel: 'llama3.2',
-      training: {
-        enabled: false,
-        intervalHours: 1,
-        useIncremental: true,
-        enableRulesTrigger: true,
-        rulesThreshold: 5,
-        forceFullRetrainEvery: 24,
-      },
-      ollama: {
-        autoAnalyze: false,
-        analyzeIntervalMinutes: 30,
-      },
-      logging: {
-        maxDays: 7,
-        maxSizeMB: 100,
-        chunkSizeMB: 4,
-      },
-    };
+    return createDefaultConfig();
   }
 
   saveConfig() {
     const configPath = path.join(CONFIG_DIR, 'user-config.json');
+    this.config = mergeConfig(this.config);
     fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
   }
 
@@ -81,6 +56,10 @@ class DashboardWorker {
       const { type, id, payload } = msg;
       let result;
 
+      if (this.handleWorkerResponse(msg)) {
+        return;
+      }
+
       try {
         switch (type) {
           case 'DASHBOARD_GET_CONFIG':
@@ -88,7 +67,7 @@ class DashboardWorker {
             break;
 
           case 'DASHBOARD_SAVE_CONFIG':
-            result = this.saveDashboardConfig(payload);
+            result = await this.saveDashboardConfig(payload);
             break;
 
           case 'DASHBOARD_GET_RULES':
@@ -96,11 +75,11 @@ class DashboardWorker {
             break;
 
           case 'DASHBOARD_ADD_RULE':
-            result = this.addRule(payload);
+            result = await this.addRule(payload);
             break;
 
           case 'DASHBOARD_DELETE_RULE':
-            result = this.deleteRule(payload);
+            result = await this.deleteRule(payload);
             break;
 
           case 'DASHBOARD_GET_BLOCKED_IPS':
@@ -162,45 +141,54 @@ class DashboardWorker {
     });
   }
 
+  handleWorkerResponse(msg) {
+    const { type, id, result } = msg;
+    if (!id || !this.pendingWorkerRequests.has(id)) {
+      return false;
+    }
+
+    const { resolve, reject, timeout } = this.pendingWorkerRequests.get(id);
+    clearTimeout(timeout);
+    this.pendingWorkerRequests.delete(id);
+
+    if (type === 'RESPONSE_ERROR') {
+      reject(new Error(result?.error || 'Worker request failed'));
+    } else {
+      resolve(result);
+    }
+
+    return true;
+  }
+
+  requestWorker(type, payload = {}) {
+    return new Promise((resolve, reject) => {
+      const id = `dashboard-${++this.requestId}`;
+      const timeout = setTimeout(() => {
+        this.pendingWorkerRequests.delete(id);
+        reject(new Error(`Timeout waiting for ${type}`));
+      }, 30000);
+
+      this.pendingWorkerRequests.set(id, { resolve, reject, timeout });
+      parentPort.postMessage({ type, id, payload });
+    });
+  }
+
   getConfig() {
     this.loadConfig();
     return {
       success: true,
-      config: {
-        port: this.config.port || 3000,
-        hindsight: this.config.hindsight || { baseUrl: 'http://localhost:8888' },
-        enforcement: this.config.enforcement || {
-          blockScore: 85,
-          throttleScore: 70,
-          monitorScore: 40,
-        },
-        rulesFilePath: this.config.rulesFilePath || '',
-        importedRules: this.config.importedRules || [],
-        ollamaEndpoint: this.config.ollamaEndpoint || 'http://localhost:11434',
-        ollamaModel: this.config.ollamaModel || 'llama3.2',
-        training: this.config.training || {
-          enabled: false,
-          intervalHours: 1,
-          useIncremental: true,
-          enableRulesTrigger: true,
-          rulesThreshold: 5,
-          forceFullRetrainEvery: 24,
-        },
-        ollama: this.config.ollama || {
-          autoAnalyze: false,
-          analyzeIntervalMinutes: 30,
-        },
-        logging: this.config.logging || {
-          maxDays: 7,
-          maxSizeMB: 100,
-          chunkSizeMB: 4,
-        },
-      }
+      config: mergeConfig(this.config)
     };
   }
 
-  saveDashboardConfig(newConfig) {
+  async saveDashboardConfig(newConfig) {
     this.loadConfig();
+    const rulesChanged = newConfig.rulesFilePath !== undefined || newConfig.importedRules !== undefined;
+    const mlConfigChanged = rulesChanged
+      || newConfig.training !== undefined
+      || newConfig.ollama !== undefined
+      || newConfig.ollamaEndpoint !== undefined
+      || newConfig.ollamaModel !== undefined;
 
     if (newConfig.port !== undefined) this.config.port = newConfig.port;
     if (newConfig.hindsight) this.config.hindsight = { ...this.config.hindsight, ...newConfig.hindsight };
@@ -239,18 +227,17 @@ class DashboardWorker {
 
     this.saveConfig();
 
-    // Notify ML worker about rules changed
-    parentPort.postMessage({
-      type: 'ML_RULES_CHANGED',
-      payload: {}
-    });
+    if (mlConfigChanged) {
+      await this.requestWorker('ML_REFRESH_CONFIG', {});
+    }
+
+    if (rulesChanged) {
+      await this.requestWorker('ML_RULES_CHANGED', {});
+    }
 
     // Notify logging worker about config change
     if (newConfig.logging) {
-      parentPort.postMessage({
-        type: 'LOG_SET_CONFIG',
-        payload: newConfig.logging
-      });
+      await this.requestWorker('LOG_SET_CONFIG', newConfig.logging);
     }
 
     this.logAdmin({ event: 'settings_saved', changes: Object.keys(newConfig) });
@@ -262,13 +249,13 @@ class DashboardWorker {
     this.loadConfig();
     return {
       success: true,
-      rules: this.config.importedRules || [],
+      importedRules: this.config.importedRules || [],
       rulesFilePath: this.config.rulesFilePath || '',
-      rules: this.config.rules || [],
+      autoRules: this.config.rules || [],
     };
   }
 
-  addRule(rule) {
+  async addRule(rule) {
     this.loadConfig();
     if (!this.config.importedRules) this.config.importedRules = [];
 
@@ -281,17 +268,14 @@ class DashboardWorker {
 
     this.saveConfig();
 
-    parentPort.postMessage({
-      type: 'ML_RULES_CHANGED',
-      payload: {}
-    });
+    await this.requestWorker('ML_RULES_CHANGED', {});
 
     this.logAdmin({ event: 'rule_added', pattern: rule.pattern });
 
     return { success: true, ruleCount: this.config.importedRules.length };
   }
 
-  deleteRule({ index }) {
+  async deleteRule({ index }) {
     this.loadConfig();
     if (!this.config.importedRules || index < 0 || index >= this.config.importedRules.length) {
       return { success: false, error: 'Invalid index' };
@@ -300,10 +284,7 @@ class DashboardWorker {
     const removed = this.config.importedRules.splice(index, 1)[0];
     this.saveConfig();
 
-    parentPort.postMessage({
-      type: 'ML_RULES_CHANGED',
-      payload: {}
-    });
+    await this.requestWorker('ML_RULES_CHANGED', {});
 
     this.logAdmin({ event: 'rule_deleted', pattern: removed.pattern });
 
@@ -311,47 +292,20 @@ class DashboardWorker {
   }
 
   async getBlockedIPs() {
-    // Ask pipeline worker for blocked IPs
-    return new Promise((resolve) => {
-      parentPort.postMessage({ type: 'PIPELINE_GET_BLOCKED_IPS', id: Date.now() });
-      
-      // For now, read directly
-      const blockedPath = path.join(CONFIG_DIR, 'blocked-ips.json');
-      try {
-        if (fs.existsSync(blockedPath)) {
-          const data = JSON.parse(fs.readFileSync(blockedPath, 'utf8'));
-          const ips = Object.values(data).map(entry => ({
-            ...entry,
-            isExpired: new Date(entry.expiresAt) < new Date(),
-          }));
-          resolve({ success: true, ips });
-        } else {
-          resolve({ success: true, ips: [] });
-        }
-      } catch (e) {
-        resolve({ success: false, error: e.message });
-      }
-    });
+    return this.requestWorker('PIPELINE_GET_BLOCKED_IPS', {});
   }
 
   async blockIP({ ip, reason, manualBlock = true }) {
-    return new Promise((resolve) => {
-      parentPort.postMessage({
-        type: 'PIPELINE_BLOCK_IP',
-        payload: { ip, reason: reason || 'manual_block', score: 85, manualBlock }
-      });
-      resolve({ success: true, ip });
+    return this.requestWorker('PIPELINE_BLOCK_IP', {
+      ip,
+      reason: reason || 'manual_block',
+      score: 85,
+      manualBlock,
     });
   }
 
   async unblockIP({ ip }) {
-    return new Promise((resolve) => {
-      parentPort.postMessage({
-        type: 'PIPELINE_UNBLOCK_IP',
-        payload: { ip }
-      });
-      resolve({ success: true, ip });
-    });
+    return this.requestWorker('PIPELINE_UNBLOCK_IP', { ip });
   }
 
   getRulesByIP(ip) {
@@ -410,23 +364,14 @@ class DashboardWorker {
     this.loadConfig();
     return {
       success: true,
-      status: this.config.training || {
-        trainingStatus: 'idle',
-        lastTrainedAt: null,
-        rulesChangedSinceLastTrain: 0,
-      }
+      status: this.config.training
     };
   }
 
   async triggerTraining({ mode = 'full' }) {
-    return new Promise((resolve) => {
-      parentPort.postMessage({
-        type: 'ML_TRAIN',
-        payload: { mode }
-      });
-      this.logAdmin({ event: 'training_triggered', mode });
-      resolve({ success: true, mode });
-    });
+    const result = await this.requestWorker('ML_TRAIN', { mode });
+    this.logAdmin({ event: 'training_triggered', mode });
+    return result;
   }
 
   getSuggestions() {
@@ -463,10 +408,7 @@ class DashboardWorker {
           suggestions.splice(index, 1);
           fs.writeFileSync(suggestionsPath, JSON.stringify(suggestions, null, 2));
           
-          parentPort.postMessage({
-            type: 'ML_RULES_CHANGED',
-            payload: {}
-          });
+          await this.requestWorker('ML_RULES_CHANGED', {});
           
           this.logAdmin({ event: 'ollama_suggestion_approved', pattern: suggestion.pattern });
           
@@ -503,6 +445,22 @@ class DashboardWorker {
     
     const logLine = `[${timestamp}] ${JSON.stringify(event)}\n`;
     fs.appendFileSync(adminLogPath, logLine);
+    this.events.push({
+      type: 'admin_log',
+      time: timestamp,
+      ...event,
+    });
+    if (this.events.length > this.maxEvents) {
+      this.events.shift();
+    }
+
+    parentPort.postMessage({
+      type: 'ADMIN_LOG',
+      payload: {
+        time: timestamp,
+        ...event,
+      }
+    });
   }
 }
 

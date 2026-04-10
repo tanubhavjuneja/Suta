@@ -9,6 +9,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CONFIG_DIR = path.join(__dirname, '../../config');
+const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MINUTES || '5', 10) * 60 * 1000;
+const SESSION_BUFFER_THRESHOLD = parseInt(process.env.SESSION_BUFFER_THRESHOLD || '5', 10);
 
 class PipelineWorker {
   constructor() {
@@ -137,7 +139,7 @@ class PipelineWorker {
     // Check assessment cache
     if (actorId) {
       const cached = this.assessmentCache.get(actorId);
-      if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
         if (cached.assessment.threat_score >= 90) {
           return {
             action: cached.assessment.recommended_action || 'block',
@@ -165,8 +167,7 @@ class PipelineWorker {
     });
 
     // Check if buffer threshold reached
-    const threshold = 5;
-    if (session.requests.length >= threshold) {
+    if (session.requests.length >= SESSION_BUFFER_THRESHOLD) {
       // Session analysis would happen here - for now, pass through
       // ML model would be called via parentPort
     }

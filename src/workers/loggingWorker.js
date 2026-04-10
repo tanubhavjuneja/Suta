@@ -5,21 +5,15 @@ import { parentPort } from 'worker_threads';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createDefaultConfig, mergeConfig } from '../configDefaults.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const LOG_DIR = path.join(__dirname, '../../config/logs');
-const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
-const DEFAULT_MAX_DAYS = 7;
-const DEFAULT_MAX_SIZE_MB = 100;
 
 class LoggingWorker {
   constructor() {
-    this.logConfig = {
-      maxDays: DEFAULT_MAX_DAYS,
-      maxSizeMB: DEFAULT_MAX_SIZE_MB,
-      chunkSizeMB: 4
-    };
+    this.logConfig = { ...createDefaultConfig().logging };
     this.currentLogFile = null;
     this.currentLogStream = null;
     this.currentLogSize = 0;
@@ -65,8 +59,9 @@ class LoggingWorker {
       if (fs.existsSync(configPath)) {
         config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       }
-      config.logging = this.logConfig;
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      const merged = mergeConfig(config);
+      merged.logging = { ...merged.logging, ...this.logConfig };
+      fs.writeFileSync(configPath, JSON.stringify(merged, null, 2));
     } catch (e) {
       console.error('[LoggingWorker] Failed to save config:', e.message);
     }
@@ -92,8 +87,12 @@ class LoggingWorker {
     this.adminLogStream = fs.createWriteStream(filepath, { flags: 'a' });
   }
 
+  getChunkSizeBytes() {
+    return (this.logConfig.chunkSizeMB || createDefaultConfig().logging.chunkSizeMB) * 1024 * 1024;
+  }
+
   rotateLogIfNeeded() {
-    if (this.currentLogSize >= CHUNK_SIZE) {
+    if (this.currentLogSize >= this.getChunkSizeBytes()) {
       this.currentLogStream.end();
       this.initLogStream();
     }

@@ -10,23 +10,37 @@
   },
   "rulesFilePath": "",
   "importedRules": [],
+  "rules": [],
   "ollamaEndpoint": "http://localhost:11434",
   "ollamaModel": "llama3.2",
+  "logging": {
+    "maxDays": 7,
+    "maxSizeMB": 100,
+    "chunkSizeMB": 4
+  },
   "training": {
     "enabled": false,
     "intervalHours": 1,
     "useIncremental": true,
     "enableRulesTrigger": false,
     "rulesThreshold": 5,
-    "forceFullRetrainEvery": 24
+    "forceFullRetrainEvery": 24,
+    "trainingStatus": "completed",
+    "lastTrainedAt": "2026-04-10T19:55:58.787Z",
+    "nextScheduledAt": null,
+    "rulesChangedSinceLastTrain": 0
   },
   "ollama": {
     "autoAnalyze": false,
-    "analyzeIntervalMinutes": 30
+    "analyzeIntervalMinutes": 30,
+    "analysisStatus": "idle",
+    "lastAnalyzedAt": null
   },
-  "logging": {
-    "maxDays": 7,
-    "maxSizeMB": 100,
-    "chunkSizeMB": 4
+  "_stats": {
+    "totalRequests": 0,
+    "allowed": 0,
+    "blocked": 0,
+    "blockedIPs": 0,
+    "activeActors": 0
   }
 }

@@ -8,9 +8,7 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { 
   config, 
-  loadUserConfig, 
-  saveUserConfig,
-  updateConfig 
+  loadUserConfig
 } from './runtimeConfig.js';
 import { setupMemoryBank } from './memory/bankSetup.js';
 import eventLog from './engine/eventLog.js';
@@ -33,6 +31,17 @@ let ollamaAvailable = false;
 // Load config on startup
 loadUserConfig();
 
+async function syncRuntimeConfigFromWorkers() {
+  try {
+    const result = await workerManager.getConfig();
+    if (result.success && result.config) {
+      Object.assign(config, result.config);
+    }
+  } catch (e) {
+    // Keep existing runtime config when worker sync is unavailable
+  }
+}
+
 // WebSocket for real-time dashboard
 const wss = new WebSocketServer({ server, path: '/ws' });
 
@@ -49,6 +58,10 @@ wss.on('connection', (ws) => {
 // Listen for events from workers
 workerManager.on('admin_log', (event) => {
   console.log('[Admin]', JSON.stringify(event));
+  const msg = JSON.stringify({ type: 'event', event: { type: 'admin_log', ...event } });
+  for (const client of wss.clients) {
+    if (client.readyState === 1) client.send(msg);
+  }
 });
 
 workerManager.on('pipeline_log', (event) => {
@@ -296,6 +309,7 @@ app.post('/admin/config', async (req, res) => {
   try {
     const newConfig = req.body;
     await workerManager.saveConfig(newConfig);
+    await syncRuntimeConfigFromWorkers();
     res.json({ success: true });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
@@ -411,6 +425,7 @@ app.post('/admin/training/schedule', async (req, res) => {
   if (training) {
     try {
       await workerManager.saveConfig({ training });
+      await syncRuntimeConfigFromWorkers();
       res.json({ success: true });
     } catch (e) {
       res.status(400).json({ success: false, error: e.message });
@@ -425,6 +440,7 @@ app.post('/admin/training/reset-stats', async (req, res) => {
     await workerManager.saveConfig({
       training: { rulesChangedSinceLastTrain: 0 }
     });
+    await syncRuntimeConfigFromWorkers();
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
@@ -460,6 +476,7 @@ app.get('/admin/logs', async (req, res) => {
   }
 });
 
+// Log config routes — MUST be before /admin/logs/:filename to avoid route conflict
 app.get('/admin/logs/config', async (req, res) => {
   try {
     const result = await workerManager.getLogConfig();
@@ -472,12 +489,14 @@ app.get('/admin/logs/config', async (req, res) => {
 app.post('/admin/logs/config', async (req, res) => {
   try {
     const result = await workerManager.setLogConfig(req.body);
+    await syncRuntimeConfigFromWorkers();
     res.json(result);
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
 });
 
+// Read specific log file — after /config to prevent 'config' matching as :filename
 app.get('/admin/logs/:filename', async (req, res) => {
   try {
     const { filename } = req.params;
@@ -489,23 +508,7 @@ app.get('/admin/logs/:filename', async (req, res) => {
   }
 });
 
-app.get('/admin/logs/config', async (req, res) => {
-  try {
-    const result = await workerManager.getLogConfig();
-    res.json(result.config || { maxDays: 7, maxSizeMB: 100, chunkSizeMB: 4 });
-  } catch (e) {
-    res.json({ maxDays: 7, maxSizeMB: 100, chunkSizeMB: 4 });
-  }
-});
 
-app.post('/admin/logs/config', async (req, res) => {
-  try {
-    const result = await workerManager.setLogConfig(req.body);
-    res.json(result);
-  } catch (e) {
-    res.status(400).json({ success: false, error: e.message });
-  }
-});
 
 // STARTUP
 async function start() {
@@ -533,10 +536,7 @@ async function start() {
 
   // Load config from worker
   try {
-    const configResult = await workerManager.getConfig();
-    if (configResult.success && configResult.config) {
-      Object.assign(config, configResult.config);
-    }
+    await syncRuntimeConfigFromWorkers();
   } catch (e) {
     console.log('[Config] Using default config');
   }

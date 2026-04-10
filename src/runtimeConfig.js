@@ -1,10 +1,10 @@
 // src/runtimeConfig.js
 // Shared runtime configuration - exported for both server.js and enforcer.js
 // This avoids circular imports while allowing dynamic config updates
-import 'dotenv/config';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { createDefaultConfig, mergeConfig } from './configDefaults.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,76 +20,22 @@ const modelCachePath = join(configDir, 'model-cache.json');
 const blockedIPsPath = join(configDir, 'blocked-ips.json');
 const rulesPath = join(configDir, 'rules.json');
 
-// Default config - reads from environment variables first, then hardcoded fallbacks
-const defaultConfig = {
-  port: parseInt(process.env.PORT || '3000', 10),
-  hindsight: { 
-    baseUrl: process.env.HINDSIGHT_BASE_URL || 'http://localhost:8888',
-  },
-  enforcement: { 
-    blockScore: parseInt(process.env.BLOCK_SCORE || '85', 10),
-    throttleScore: parseInt(process.env.THROTTLE_SCORE || '70', 10),
-    monitorScore: parseInt(process.env.MONITOR_SCORE || '40', 10),
-  },
-  rulesFilePath: process.env.RULES_FILE_PATH || '',
-  importedRules: [],
-  ollamaEndpoint: process.env.OLLAMA_ENDPOINT || 'http://localhost:11434',
-  ollamaModel: process.env.OLLAMA_MODEL || 'llama3.2',
-  
-  // Logging configuration
-  logging: {
-    maxDays: parseInt(process.env.LOG_MAX_DAYS || '7', 10),
-    maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB || '100', 10),
-    chunkSizeMB: parseInt(process.env.LOG_CHUNK_SIZE_MB || '4', 10),
-  },
-  
-  // Training configuration
-  training: {
-    enabled: process.env.TRAINING_ENABLED === 'true' || false,
-    intervalHours: parseInt(process.env.TRAINING_INTERVAL_HOURS || '1', 10),
-    useIncremental: true,
-    enableRulesTrigger: true,
-    rulesThreshold: parseInt(process.env.TRAINING_RULES_THRESHOLD || '5', 10),
-    forceFullRetrainEvery: parseInt(process.env.TRAINING_FULL_RETRAIN_HOURS || '24', 10),
-    trainingStatus: 'idle',
-    lastTrainedAt: null,
-    nextScheduledAt: null,
-    rulesChangedSinceLastTrain: 0,
-  },
-  
-  // Ollama analysis configuration
-  ollama: {
-    autoAnalyze: process.env.OLLAMA_AUTO_ANALYZE === 'true' || false,
-    analyzeIntervalMinutes: parseInt(process.env.OLLAMA_ANALYZE_INTERVAL || '30', 10),
-    analysisStatus: 'idle',
-    lastAnalyzedAt: null,
-  },
-  
-  // Runtime stats
-  _stats: {
-    totalRequests: 0,
-    allowed: 0,
-    blocked: 0,
-    blockedIPs: 0,
-    activeActors: 0,
-  },
-};
-
-// Runtime config - starts with defaults, then loads from user config file
-let runtimeConfig = { ...defaultConfig };
+// Runtime config - preserve this object reference so imports stay in sync
+const runtimeConfig = mergeConfig();
 
 // Load from user config file if exists
 export function loadUserConfig() {
   try {
+    let saved = {};
     if (fs.existsSync(userConfigPath)) {
       const data = fs.readFileSync(userConfigPath, 'utf8');
-      const saved = JSON.parse(data);
-      // Merge saved config with defaults (env vars take precedence)
-      runtimeConfig = { ...defaultConfig, ...saved };
+      saved = JSON.parse(data);
       console.log('[Config] Loaded user config from file');
     }
+    Object.assign(runtimeConfig, mergeConfig(saved));
   } catch (e) {
     console.log('[Config] Using default config');
+    Object.assign(runtimeConfig, createDefaultConfig());
   }
   return runtimeConfig;
 }
@@ -209,6 +155,10 @@ export function updateConfig(newConfig) {
     runtimeConfig.importedRules = newConfig.importedRules;
     changed = true;
   }
+  if (newConfig.rules) {
+    runtimeConfig.rules = newConfig.rules;
+    changed = true;
+  }
   if (newConfig.ollamaEndpoint !== undefined) {
     runtimeConfig.ollamaEndpoint = newConfig.ollamaEndpoint;
     changed = true;
@@ -246,15 +196,19 @@ export function updateConfig(newConfig) {
     }
     if (newConfig.training.trainingStatus !== undefined) {
       runtimeConfig.training.trainingStatus = newConfig.training.trainingStatus;
+      changed = true;
     }
     if (newConfig.training.lastTrainedAt !== undefined) {
       runtimeConfig.training.lastTrainedAt = newConfig.training.lastTrainedAt;
+      changed = true;
     }
     if (newConfig.training.nextScheduledAt !== undefined) {
       runtimeConfig.training.nextScheduledAt = newConfig.training.nextScheduledAt;
+      changed = true;
     }
     if (newConfig.training.rulesChangedSinceLastTrain !== undefined) {
       runtimeConfig.training.rulesChangedSinceLastTrain = newConfig.training.rulesChangedSinceLastTrain;
+      changed = true;
     }
   }
   
@@ -270,9 +224,26 @@ export function updateConfig(newConfig) {
     }
     if (newConfig.ollama.analysisStatus !== undefined) {
       runtimeConfig.ollama.analysisStatus = newConfig.ollama.analysisStatus;
+      changed = true;
     }
     if (newConfig.ollama.lastAnalyzedAt !== undefined) {
       runtimeConfig.ollama.lastAnalyzedAt = newConfig.ollama.lastAnalyzedAt;
+      changed = true;
+    }
+  }
+
+  if (newConfig.logging) {
+    if (newConfig.logging.maxDays !== undefined) {
+      runtimeConfig.logging.maxDays = newConfig.logging.maxDays;
+      changed = true;
+    }
+    if (newConfig.logging.maxSizeMB !== undefined) {
+      runtimeConfig.logging.maxSizeMB = newConfig.logging.maxSizeMB;
+      changed = true;
+    }
+    if (newConfig.logging.chunkSizeMB !== undefined) {
+      runtimeConfig.logging.chunkSizeMB = newConfig.logging.chunkSizeMB;
+      changed = true;
     }
   }
   
@@ -280,18 +251,23 @@ export function updateConfig(newConfig) {
   if (newConfig._stats) {
     if (newConfig._stats.totalRequests !== undefined) {
       runtimeConfig._stats.totalRequests = newConfig._stats.totalRequests;
+      changed = true;
     }
     if (newConfig._stats.allowed !== undefined) {
       runtimeConfig._stats.allowed = newConfig._stats.allowed;
+      changed = true;
     }
     if (newConfig._stats.blocked !== undefined) {
       runtimeConfig._stats.blocked = newConfig._stats.blocked;
+      changed = true;
     }
     if (newConfig._stats.blockedIPs !== undefined) {
       runtimeConfig._stats.blockedIPs = newConfig._stats.blockedIPs;
+      changed = true;
     }
     if (newConfig._stats.activeActors !== undefined) {
       runtimeConfig._stats.activeActors = newConfig._stats.activeActors;
+      changed = true;
     }
   }
   

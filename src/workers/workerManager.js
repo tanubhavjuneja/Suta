@@ -14,7 +14,9 @@ class WorkerManager extends EventEmitter {
     super();
     this.workers = new Map();
     this.messageId = 0;
+    this.relayMessageId = 0;
     this.pendingMessages = new Map();
+    this.pendingRelays = new Map();
   }
 
   async spawnWorker(name, workerPath) {
@@ -85,13 +87,69 @@ class WorkerManager extends EventEmitter {
       return;
     }
 
+    if (id && this.pendingRelays.has(id)) {
+      const relay = this.pendingRelays.get(id);
+      this.pendingRelays.delete(id);
+
+      const sourceWorker = this.workers.get(relay.sourceWorker);
+      if (sourceWorker) {
+        sourceWorker.postMessage({
+          type,
+          id: relay.sourceId,
+          result,
+          payload,
+        });
+      }
+      return;
+    }
+
     if (type === 'ADMIN_LOG') {
       this.emit('admin_log', payload);
     } else if (type === 'PIPELINE_LOG') {
       this.emit('pipeline_log', payload);
     } else if (type === 'WORKER_LOG') {
       this.emit('worker_log', payload);
+    } else {
+      const targetWorker = this.getForwardTarget(workerName, type);
+      if (targetWorker) {
+        this.forwardWorkerMessage(workerName, targetWorker, msg);
+      }
     }
+  }
+
+  getForwardTarget(sourceWorker, type) {
+    if (type.startsWith('LOG_') && sourceWorker !== 'logging') return 'logging';
+    if (type.startsWith('ML_') && sourceWorker !== 'ml') return 'ml';
+    if (type.startsWith('PIPELINE_') && sourceWorker !== 'pipeline') return 'pipeline';
+    if (type.startsWith('DASHBOARD_') && sourceWorker !== 'dashboard') return 'dashboard';
+    return null;
+  }
+
+  forwardWorkerMessage(sourceWorker, targetWorker, msg) {
+    const worker = this.workers.get(targetWorker);
+    if (!worker) {
+      return;
+    }
+
+    if (msg.id) {
+      const relayId = `relay-${++this.relayMessageId}`;
+      this.pendingRelays.set(relayId, {
+        sourceWorker,
+        sourceId: msg.id,
+      });
+
+      worker.postMessage({
+        type: msg.type,
+        id: relayId,
+        payload: msg.payload,
+      });
+      return;
+    }
+
+    worker.postMessage({
+      type: msg.type,
+      payload: msg.payload,
+    });
   }
 
   async log(level, message) {

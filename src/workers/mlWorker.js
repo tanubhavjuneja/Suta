@@ -5,17 +5,29 @@ import { parentPort } from 'worker_threads';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createDefaultConfig, mergeConfig } from '../configDefaults.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CONFIG_DIR = path.join(__dirname, '../../config');
 const MODEL_DIR = path.join(CONFIG_DIR, 'model');
+const FALLBACK_PATTERNS = [
+  { label: 'normal', riskRange: [0, 20], count: 40, generator: {} },
+  { label: 'credential_stuffing', riskRange: [70, 98], count: 30, generator: {} },
+  { label: 'data_scraping', riskRange: [55, 90], count: 30, generator: {} },
+  { label: 'enumeration', riskRange: [50, 85], count: 30, generator: {} },
+  { label: 'rate_limit_evasion', riskRange: [45, 80], count: 20, generator: {} },
+  { label: 'brute_force', riskRange: [75, 99], count: 20, generator: {} },
+];
 
 class MLWorker {
   constructor() {
     this.isTraining = false;
     this.modelLoaded = false;
     this.modelInfo = { trained: false };
+    this.config = createDefaultConfig();
+    this.trainingTimer = null;
+    this.analysisTimer = null;
     this.init();
   }
 
@@ -23,6 +35,7 @@ class MLWorker {
     this.ensureDirs();
     this.loadConfig();
     this.setupHandlers();
+    this.startSchedulers();
     console.log('[MLWorker] Initialized');
   }
 
@@ -36,16 +49,19 @@ class MLWorker {
     const configPath = path.join(CONFIG_DIR, 'user-config.json');
     try {
       if (fs.existsSync(configPath)) {
-        this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        this.config = mergeConfig(JSON.parse(fs.readFileSync(configPath, 'utf8')));
+      } else {
+        this.config = createDefaultConfig();
       }
     } catch (e) {
-      this.config = {};
+      this.config = createDefaultConfig();
     }
   }
 
   saveConfig() {
     const configPath = path.join(CONFIG_DIR, 'user-config.json');
     try {
+      this.config = mergeConfig(this.config);
       fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
     } catch (e) {
       console.error('[MLWorker] Config save failed:', e.message);
@@ -80,6 +96,10 @@ class MLWorker {
             result = { success: true };
             break;
 
+          case 'ML_REFRESH_CONFIG':
+            result = this.refreshConfig();
+            break;
+
           case 'ML_BLOCK_IP':
             result = this.handleIpBlock(payload);
             break;
@@ -110,9 +130,11 @@ class MLWorker {
 
     this.isTraining = true;
     this.logAdmin({ event: 'training_started', mode });
+    this.loadConfig();
+    this.config.training.trainingStatus = 'training';
+    this.saveConfig();
 
     try {
-      this.loadConfig();
       const rules = this.config.importedRules || [];
       const trainingData = await this.generateTrainingData(rules);
 
@@ -120,7 +142,7 @@ class MLWorker {
         throw new Error('No training data generated');
       }
 
-      const modelResult = await this.runTensorFlowTraining(trainingData, mode);
+      await this.runTensorFlowTraining(trainingData, mode);
       this.modelLoaded = true;
       this.modelInfo = {
         trained: true,
@@ -135,6 +157,7 @@ class MLWorker {
       this.config.training.trainingStatus = 'completed';
       this.config.training.lastTrainedAt = new Date().toISOString();
       this.config.training.rulesChangedSinceLastTrain = 0;
+      this.updateNextTrainingSchedule();
       this.saveConfig();
 
       this.logAdmin({ 
@@ -150,6 +173,9 @@ class MLWorker {
         timestamp: new Date().toISOString()
       };
     } catch (e) {
+      this.loadConfig();
+      this.config.training.trainingStatus = 'failed';
+      this.saveConfig();
       this.logAdmin({ event: 'training_failed', error: e.message });
       return { success: false, error: e.message };
     } finally {
@@ -157,23 +183,66 @@ class MLWorker {
     }
   }
 
+  loadTrainingPatterns() {
+    const patternsPath = path.join(CONFIG_DIR, 'training-patterns.json');
+
+    try {
+      if (!fs.existsSync(patternsPath)) {
+        return [];
+      }
+
+      const raw = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
+      if (Array.isArray(raw)) {
+        return raw.length > 0 ? raw : FALLBACK_PATTERNS;
+      }
+      if (Array.isArray(raw.patterns)) {
+        return raw.patterns.length > 0 ? raw.patterns : FALLBACK_PATTERNS;
+      }
+      if (raw.patterns && typeof raw.patterns === 'object') {
+        const patterns = Object.values(raw.patterns).filter((entry) => entry && typeof entry === 'object');
+        return patterns.length > 0 ? patterns : FALLBACK_PATTERNS;
+      }
+
+      const patterns = Object.values(raw).filter((entry) =>
+        entry && typeof entry === 'object' && (entry.label || entry.generator || entry.riskRange)
+      );
+      return patterns.length > 0 ? patterns : FALLBACK_PATTERNS;
+    } catch (e) {
+      console.log('[MLWorker] Failed to load training patterns:', e.message);
+      return FALLBACK_PATTERNS;
+    }
+
+    return FALLBACK_PATTERNS;
+  }
+
   async generateTrainingData(rules) {
     const features = [];
     const riskScores = [];
     const attackLabels = [];
 
-    // Generate from patterns
-    const patternsPath = path.join(CONFIG_DIR, 'training-patterns.json');
-    let patterns = [];
-    if (fs.existsSync(patternsPath)) {
-      patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
-    }
-
-    patterns.forEach(p => {
-      const featureVector = this.patternToFeatures(p);
-      features.push(featureVector);
-      riskScores.push(p.risk_score || 50);
-      attackLabels.push(this.labelToOneHot(p.attack_type || 'normal'));
+    // Generate from patterns file
+    const patterns = this.loadTrainingPatterns();
+    patterns.forEach((p) => {
+      // Generate synthetic samples from each pattern category
+      const count = p.count || 1;
+      const gen = p.generator || {};
+      for (let i = 0; i < Math.min(count, 20); i++) {
+        const featureVector = this.patternToFeatures({
+          interval_mean: this.randRange(gen.avgIntervalMs?.min || 500, gen.avgIntervalMs?.max || 5000),
+          interval_std: this.randRange(gen.stdDevMs?.min || 50, gen.stdDevMs?.max || 2000),
+          request_count: this.randRange(gen.requestCount?.min || 5, gen.requestCount?.max || 50),
+          endpoint_diversity: gen.endpoints ? 1 / gen.endpoints.length : 0.5,
+          auth_present: gen.authPattern?.includes('consistent_bearer') || false,
+          risk_score: this.randRange(p.riskRange?.[0] || 0, p.riskRange?.[1] || 50),
+          header_anomaly: gen.missingHeaders?.length > 3 ? 0.8 : 0.1,
+          body_anomaly: gen.bodyShapes?.length === 1 ? 0.6 : 0.2,
+          rate_burst: (gen.avgIntervalMs?.min || 500) < 100 ? 0.9 : 0.1,
+          ip_variance: (gen.ipCount?.max || 1) > 2 ? 0.8 : 0.2,
+        });
+        features.push(featureVector);
+        riskScores.push(this.randRange(p.riskRange?.[0] || 0, p.riskRange?.[1] || 50));
+        attackLabels.push(this.labelToOneHot(p.label || 'normal'));
+      }
     });
 
     // Generate from rules
@@ -186,7 +255,7 @@ class MLWorker {
       });
     }
 
-    // Query Hindsight for blocked IPs
+    // Query Hindsight for blocked IPs (local file)
     const blockedIPs = this.getBlockedIPs();
     blockedIPs.forEach(ipEntry => {
       const featureVector = this.ipToFeatures(ipEntry);
@@ -195,7 +264,22 @@ class MLWorker {
       attackLabels.push(this.labelToOneHot('credential_stuffing'));
     });
 
+    // Query Hindsight logs for blocked actor data (enrichment)
+    const hindsightData = await this.queryHindsightForTraining();
+    hindsightData.forEach(entry => {
+      const featureVector = this.ipToFeatures({
+        score: entry.score || 75,
+      });
+      features.push(featureVector);
+      riskScores.push(entry.score || 75);
+      attackLabels.push(this.labelToOneHot(entry.attackType || 'credential_stuffing'));
+    });
+
     return { features, riskScores, attackLabels };
+  }
+
+  randRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   patternToFeatures(pattern) {
@@ -313,6 +397,136 @@ class MLWorker {
     return [];
   }
 
+  async queryHindsightForTraining() {
+    // Query admin audit logs for blocked actor entries to enrich training data
+    try {
+      const logsDir = path.join(CONFIG_DIR, 'logs');
+      if (!fs.existsSync(logsDir)) return [];
+
+      const files = fs.readdirSync(logsDir)
+        .filter(f => f.startsWith('admin-audit-') && f.endsWith('.log'))
+        .sort((a, b) => b.localeCompare(a))
+        .slice(0, 7); // Last 7 days
+
+      const entries = [];
+      for (const file of files) {
+        const content = fs.readFileSync(path.join(logsDir, file), 'utf8');
+        const lines = content.split('\n').filter(l => l.trim());
+
+        for (const line of lines) {
+          try {
+            // Parse log line: [timestamp] {json}
+            const jsonStart = line.indexOf('{');
+            if (jsonStart < 0) continue;
+            const event = JSON.parse(line.substring(jsonStart));
+
+            if (event.event === 'ip_blocked' && event.score) {
+              entries.push({
+                ip: event.ip,
+                score: event.score,
+                reason: event.reason,
+                attackType: this.reasonToAttackType(event.reason),
+              });
+            }
+          } catch (e) { /* skip malformed lines */ }
+        }
+      }
+
+      console.log(`[MLWorker] Enriched training with ${entries.length} Hindsight entries`);
+      return entries;
+    } catch (e) {
+      console.log('[MLWorker] Hindsight query failed:', e.message);
+      return [];
+    }
+  }
+
+  reasonToAttackType(reason) {
+    if (!reason) return 'normal';
+    const r = reason.toLowerCase();
+    if (r.includes('credential') || r.includes('brute') || r.includes('login')) return 'credential_stuffing';
+    if (r.includes('scrap') || r.includes('data')) return 'data_scraping';
+    if (r.includes('enum')) return 'enumeration';
+    if (r.includes('rate') || r.includes('evas')) return 'rate_limit_evasion';
+    if (r.includes('brute')) return 'brute_force';
+    return 'credential_stuffing'; // default for blocked IPs
+  }
+
+  // ─── Training & Analysis Schedulers ───────────────────────────
+  startSchedulers() {
+    this.loadConfig();
+
+    // Training scheduler
+    const trainingConfig = this.config.training || {};
+    this.updateNextTrainingSchedule();
+    if (trainingConfig.enabled) {
+      const intervalMs = (trainingConfig.intervalHours || 1) * 60 * 60 * 1000;
+      console.log(`[MLWorker] Training scheduler: every ${trainingConfig.intervalHours || 1}h`);
+
+      this.trainingTimer = setInterval(async () => {
+        console.log('[MLWorker] Scheduled training tick');
+        const mode = this.shouldForceFullRetrain(trainingConfig) ? 'full' : 'incremental';
+        await this.train(mode);
+        this.updateNextTrainingSchedule();
+      }, intervalMs);
+    }
+
+    // Ollama analysis scheduler
+    const ollamaConfig = this.config.ollama || {};
+    if (ollamaConfig.autoAnalyze) {
+      const analysisMs = (ollamaConfig.analyzeIntervalMinutes || 30) * 60 * 1000;
+      console.log(`[MLWorker] Analysis scheduler: every ${ollamaConfig.analyzeIntervalMinutes || 30}min`);
+
+      this.analysisTimer = setInterval(async () => {
+        console.log('[MLWorker] Scheduled Ollama analysis tick');
+        await this.runOllamaAnalysis({});
+      }, analysisMs);
+    }
+  }
+
+  updateNextTrainingSchedule() {
+    const trainingConfig = this.config.training || {};
+    if (!trainingConfig.enabled) {
+      this.config.training.nextScheduledAt = null;
+      this.saveConfig();
+      return;
+    }
+
+    const intervalMs = (trainingConfig.intervalHours || 1) * 60 * 60 * 1000;
+    this.config.training.nextScheduledAt = new Date(Date.now() + intervalMs).toISOString();
+    this.saveConfig();
+  }
+
+  refreshConfig() {
+    this.stopSchedulers();
+    this.loadConfig();
+    this.startSchedulers();
+    return {
+      success: true,
+      training: this.config.training,
+      ollama: this.config.ollama,
+    };
+  }
+
+  shouldForceFullRetrain(trainingConfig) {
+    const forceEveryHours = trainingConfig.forceFullRetrainEvery || 24;
+    const lastTrained = this.config.training?.lastTrainedAt;
+    if (!lastTrained) return true;
+
+    const hoursSince = (Date.now() - new Date(lastTrained).getTime()) / (1000 * 60 * 60);
+    return hoursSince >= forceEveryHours;
+  }
+
+  stopSchedulers() {
+    if (this.trainingTimer) {
+      clearInterval(this.trainingTimer);
+      this.trainingTimer = null;
+    }
+    if (this.analysisTimer) {
+      clearInterval(this.analysisTimer);
+      this.analysisTimer = null;
+    }
+  }
+
   async runOllamaAnalysis(payload) {
     const ollamaEndpoint = this.config.ollamaEndpoint || 'http://localhost:11434';
     const ollamaModel = this.config.ollamaModel || 'llama3.2';
@@ -328,6 +542,9 @@ class MLWorker {
     }
 
     this.logAdmin({ event: 'analysis_started' });
+    this.loadConfig();
+    this.config.ollama.analysisStatus = 'analyzing';
+    this.saveConfig();
 
     try {
       const rulesContext = (this.config.importedRules || []).map(r => 
@@ -385,6 +602,9 @@ If no new rules needed, return empty array [].`;
 
       return { success: true, suggestions };
     } catch (e) {
+      this.loadConfig();
+      this.config.ollama.analysisStatus = 'failed';
+      this.saveConfig();
       this.logAdmin({ event: 'analysis_failed', error: e.message });
       return { success: false, error: e.message };
     }
@@ -392,6 +612,7 @@ If no new rules needed, return empty array [].`;
 
   async queryLogs({ query, lines = 100 }) {
     try {
+      const maxLines = lines;
       const logsDir = path.join(CONFIG_DIR, 'logs');
       if (!fs.existsSync(logsDir)) {
         return { success: true, results: [] };
@@ -404,20 +625,20 @@ If no new rules needed, return empty array [].`;
       const results = [];
       for (const file of files.slice(0, 5)) {
         const content = fs.readFileSync(path.join(logsDir, file), 'utf8');
-        const lines = content.split('\n');
+        const fileLines = content.split('\n');
         
-        lines.forEach(line => {
+        fileLines.forEach(line => {
           if (query && line.toLowerCase().includes(query.toLowerCase())) {
             results.push({ file, line: line.trim() });
           }
         });
 
-        if (results.length >= lines) break;
+        if (results.length >= maxLines) break;
       }
 
       this.logAdmin({ event: 'logs_queried', query, resultsCount: results.length });
 
-      return { success: true, results: results.slice(0, lines) };
+      return { success: true, results: results.slice(0, maxLines) };
     } catch (e) {
       return { success: false, error: e.message };
     }
@@ -437,8 +658,12 @@ If no new rules needed, return empty array [].`;
 
     // Check if threshold reached
     const threshold = this.config.training.rulesThreshold || 5;
-    if (this.config.training.rulesChangedSinceLastTrain >= threshold) {
-      this.train('incremental');
+    if (
+      this.config.training.enableRulesTrigger !== false &&
+      this.config.training.rulesChangedSinceLastTrain >= threshold
+    ) {
+      const mode = this.config.training.useIncremental === false ? 'full' : 'incremental';
+      this.train(mode);
     }
   }
 
@@ -557,7 +782,10 @@ If no new rules needed, return empty array [].`;
     // Also send to parent for real-time updates
     parentPort.postMessage({
       type: 'ADMIN_LOG',
-      payload: event
+      payload: {
+        time: timestamp,
+        ...event,
+      }
     });
   }
 }
