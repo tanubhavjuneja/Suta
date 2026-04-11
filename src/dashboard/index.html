@@ -203,6 +203,20 @@
     .event-entry.block { color: var(--accent-red); background: rgba(201,74,74,0.04); }
     .scroll-bottom { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
     
+    /* Attack type badges */
+    .attack-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-left: 4px; }
+    .attack-badge.sql { background: rgba(201,74,74,0.15); color: #b83a3a; }
+    .attack-badge.xss { background: rgba(201,74,74,0.15); color: #b83a3a; }
+    .attack-badge.path { background: rgba(201,74,74,0.15); color: #b83a3a; }
+    .attack-badge.brute { background: rgba(200,133,48,0.15); color: #b87420; }
+    .attack-badge.ddos { background: rgba(122,92,192,0.15); color: #6a4db0; }
+    .attack-badge.scraping { background: rgba(45,138,158,0.15); color: #2d8a9e; }
+    .attack-badge.cred { background: rgba(200,133,48,0.15); color: #b87420; }
+    .attack-badge.anomaly { background: rgba(122,140,130,0.15); color: #5a6a62; }
+    .attack-badge.normal { background: rgba(45,154,109,0.1); color: #238b4d; }
+    .event-reasons { font-size: 9px; color: var(--text-muted); margin-top: 2px; padding-left: 12px; font-style: italic; }
+    .event-evidence { font-size: 9px; color: var(--accent-orange); margin-top: 1px; padding-left: 12px; }
+    
     /* Settings Modal */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(30, 45, 40, 0.4); backdrop-filter: blur(3px); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.show { display: flex; }
@@ -359,8 +373,8 @@
           </div>
           <div class="table-scroll">
             <table>
-              <thead><tr><th>IP Address</th><th>Actor</th><th>Score</th><th>Range</th><th>Source</th><th>Action</th></tr></thead>
-              <tbody id="blockedIPsBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr></tbody>
+              <thead><tr><th>IP Address</th><th>Actor</th><th>Score</th><th>Attack Type</th><th>Range</th><th>Source</th><th>Action</th></tr></thead>
+              <tbody id="blockedIPsBody"><tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -368,8 +382,8 @@
           <h3>Active Actors</h3>
           <div class="table-scroll">
             <table>
-              <thead><tr><th>Actor ID</th><th>Requests</th><th>Score</th><th>Action</th></tr></thead>
-              <tbody id="actorsBody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No actors yet</td></tr></tbody>
+              <thead><tr><th>Actor ID</th><th>Requests</th><th>Score</th><th>Attack Type</th><th>Action</th></tr></thead>
+              <tbody id="actorsBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No actors yet</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -1085,13 +1099,27 @@
           else if (event.action === 'throttle') { state.throttled++; addTrafficBucket(now, 'throttled'); }
           else if (event.action === 'monitor') { state.monitored++; addTrafficBucket(now, 'monitored'); }
           // allow events already counted via 'request' type, don't double count
-          if (event.actorId && event.action !== 'allow') trackActor(event.actorId, { lastAction: event.action, lastScore: event.score });
+          if (event.actorId && event.action !== 'allow') {
+            trackActor(event.actorId, {
+              lastAction: event.action,
+              lastScore: event.score,
+              attackType: event.attackType || null,
+            });
+          }
           break;
         case 'ml_score':
           if (event.actorId) trackActor(event.actorId, { lastMl: event.ml_risk_score });
           break;
         case 'ip_blocked':
-          state.blockedIPs.set(event.ip, { ip: event.ip, actorId: event.actorId, score: event.score, time: new Date().toLocaleTimeString() });
+          state.blockedIPs.set(event.ip, {
+            ip: event.ip, actorId: event.actorId, score: event.score,
+            attackType: event.attackType || null,
+            confidence: event.confidence || null,
+            ruleMatched: event.ruleMatched || null,
+            reasonDetail: event.reasonDetail || null,
+            evidence: event.evidence || [],
+            time: new Date().toLocaleTimeString()
+          });
           break;
         case 'assessment':
           if (event.actorId) trackActor(event.actorId, { lastScore: event.score, classification: event.classification, lastAction: event.action });
@@ -1107,13 +1135,14 @@
     }
 
     function trackActor(actorId, data) {
-      if (!state.actors.has(actorId)) state.actors.set(actorId, { id: actorId, requests: 0, lastMl: 0, lastAction: 'allow' });
+      if (!state.actors.has(actorId)) state.actors.set(actorId, { id: actorId, requests: 0, lastMl: 0, lastAction: 'allow', attackType: null });
       const actor = state.actors.get(actorId);
       if (data.requests) actor.requests += data.requests;
       if (data.lastMl !== undefined) actor.lastMl = data.lastMl;
       if (data.lastAction) actor.lastAction = data.lastAction;
       if (data.lastScore !== undefined) actor.lastScore = data.lastScore;
       if (data.classification) actor.classification = data.classification;
+      if (data.attackType) actor.attackType = data.attackType;
     }
 
     function addTrafficBucket(ts, type) {
@@ -1121,17 +1150,47 @@
       trafficBuckets.get(ts)[type]++;
     }
 
+    function getAttackBadgeClass(type) {
+      if (!type || type === 'NORMAL') return 'normal';
+      const map = { SQL_INJECTION: 'sql', XSS: 'xss', PATH_TRAVERSAL: 'path', BRUTE_FORCE: 'brute', CREDENTIAL_STUFFING: 'cred', DDOS: 'ddos', SCRAPING: 'scraping', ANOMALY: 'anomaly' };
+      return map[type] || 'anomaly';
+    }
+
+    function getAttackShortLabel(type) {
+      if (!type || type === 'NORMAL') return '';
+      const map = { SQL_INJECTION: 'SQLi', XSS: 'XSS', PATH_TRAVERSAL: 'Path Trav', BRUTE_FORCE: 'Brute Force', CREDENTIAL_STUFFING: 'Cred Stuff', DDOS: 'DDoS', SCRAPING: 'Scraping', ANOMALY: 'Anomaly' };
+      return map[type] || type;
+    }
+
     function formatEvent(e) {
+      const attackBadge = (e.attackType && e.attackType !== 'NORMAL')
+        ? ' <span class="attack-badge ' + getAttackBadgeClass(e.attackType) + '">' + getAttackShortLabel(e.attackType) + '</span>'
+        : '';
+
       switch (e.type) {
-        case 'enforcement':
+        case 'enforcement': {
           const badge = e.action === 'block' ? 'BLOCKED' : e.action === 'throttle' ? 'THROTTLED' : e.action === 'monitor' ? 'MONITOR' : 'ALLOW';
-          return badge + ' actor:' + (e.actorId ? e.actorId.substring(0,10) : '?') + ' score:' + e.score;
+          let msg = badge + ' actor:' + (e.actorId ? e.actorId.substring(0,10) : '?') + ' score:' + e.score + attackBadge;
+          // Add confidence if available
+          if (e.confidence) msg += ' (' + Math.round(e.confidence * 100) + '% conf)';
+          // Add reasons on next line
+          if (e.reasonDetail && e.reasonDetail.reasons && e.reasonDetail.reasons.length > 0) {
+            msg += '<div class="event-reasons">└ ' + e.reasonDetail.reasons.slice(0, 3).join(' • ') + '</div>';
+          }
+          return msg;
+        }
         case 'ml_score':
           return 'ML: ' + (e.ml_risk_score ? e.ml_risk_score.toFixed(1) : '0') + ' -> ' + (e.attack_type || 'unknown');
         case 'assessment':
           return 'Assess: ' + (e.actorId ? e.actorId.substring(0,10) : '?') + ' -> ' + e.score + '/100 ' + e.classification;
-        case 'ip_blocked':
-          return 'IP BLOCKED: ' + e.ip;
+        case 'ip_blocked': {
+          let msg = 'IP BLOCKED: ' + e.ip + attackBadge;
+          if (e.confidence) msg += ' (' + Math.round(e.confidence * 100) + '% conf)';
+          if (e.evidence && e.evidence.length > 0) {
+            msg += '<div class="event-evidence">└ Evidence: ' + e.evidence.slice(0, 2).join(', ') + '</div>';
+          }
+          return msg;
+        }
         default:
           return e.type + ': ' + JSON.stringify(e).substring(0, 50);
       }
@@ -1176,18 +1235,26 @@
     function updateBlockedIPsTable() {
       const body = document.getElementById('blockedIPsBody');
       const entries = Array.from(state.blockedIPs.values());
-      if (entries.length === 0) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr>'; return; }
-      body.innerHTML = entries.map(e => '<tr><td style="color:var(--accent-red);font-family:monospace;">' + e.ip + '</td><td>' + (e.actorId ? e.actorId.substring(0,12) : '-') + '</td><td>' + e.score + '</td><td>' + (e.rangeSize > 1 ? '<span style="color:var(--accent-orange)">' + e.rangeSize + ' IPs</span>' : '-') + '</td><td><span class="badge ' + (e.manual ? 'badge-block' : 'badge-allow') + '">' + (e.manual ? 'Manual' : 'Auto') + '</span></td><td><button onclick="unblockIPFromTable(\'' + e.ip + '\')" style="padding:4px 8px;background:transparent;color:var(--accent-green-bright);border:1px solid var(--accent-green-bright);border-radius:4px;font-size:10px;cursor:pointer;">Unblock</button></td></tr>').join('');
+      if (entries.length === 0) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr>'; return; }
+      body.innerHTML = entries.map(e => {
+        const attackBadge = (e.attackType && e.attackType !== 'NORMAL')
+          ? '<span class="attack-badge ' + getAttackBadgeClass(e.attackType) + '">' + getAttackShortLabel(e.attackType) + '</span>'
+          : '<span style="color:var(--text-muted)">-</span>';
+        return '<tr><td style="color:var(--accent-red);font-family:monospace;">' + e.ip + '</td><td>' + (e.actorId ? e.actorId.substring(0,12) : '-') + '</td><td>' + e.score + '</td><td>' + attackBadge + '</td><td>' + (e.rangeSize > 1 ? '<span style="color:var(--accent-orange)">' + e.rangeSize + ' IPs</span>' : '-') + '</td><td><span class="badge ' + (e.manual ? 'badge-block' : 'badge-allow') + '">' + (e.manual ? 'Manual' : 'Auto') + '</span></td><td><button onclick="unblockIPFromTable(\'' + e.ip + '\')" style="padding:4px 8px;background:transparent;color:var(--accent-green-bright);border:1px solid var(--accent-green-bright);border-radius:4px;font-size:10px;cursor:pointer;">Unblock</button></td></tr>';
+      }).join('');
     }
 
     function updateActorsTable() {
       const body = document.getElementById('actorsBody');
       const actors = Array.from(state.actors.values()).sort((a, b) => (b.lastMl || 0) - (a.lastMl || 0));
-      if (actors.length === 0) { body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No actors</td></tr>'; return; }
+      if (actors.length === 0) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No actors</td></tr>'; return; }
       body.innerHTML = actors.slice(0, 20).map(a => {
         const action = a.lastAction || 'allow';
         const badgeCls = action === 'block' ? 'badge-block' : action === 'throttle' ? 'badge-throttle' : action === 'monitor' ? 'badge-monitor' : 'badge-allow';
-        return '<tr><td>' + a.id.substring(0,12) + '</td><td>' + a.requests + '</td><td style="color:' + ((a.lastMl||0) >= 60 ? 'var(--accent-red)' : (a.lastMl||0) >= 30 ? 'var(--accent-orange)' : 'var(--accent-green-bright)') + '">' + (a.lastMl||0).toFixed(1) + '</td><td><span class="badge ' + badgeCls + '">' + action + '</span></td></tr>';
+        const attackBadge = (a.attackType && a.attackType !== 'NORMAL')
+          ? '<span class="attack-badge ' + getAttackBadgeClass(a.attackType) + '">' + getAttackShortLabel(a.attackType) + '</span>'
+          : '<span style="color:var(--text-muted);font-size:9px;">-</span>';
+        return '<tr><td>' + a.id.substring(0,12) + '</td><td>' + a.requests + '</td><td style="color:' + ((a.lastMl||0) >= 60 ? 'var(--accent-red)' : (a.lastMl||0) >= 30 ? 'var(--accent-orange)' : 'var(--accent-green-bright)') + '">' + (a.lastMl||0).toFixed(1) + '</td><td>' + attackBadge + '</td><td><span class="badge ' + badgeCls + '">' + action + '</span></td></tr>';
       }).join('');
     }
 

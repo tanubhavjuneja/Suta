@@ -108,12 +108,19 @@ app.all('/api/*', async (req, res, next) => {
     const actorId = req.actorId || generateFingerprint(req);
     console.log(`[Server] Request: ${parsed.method} ${parsed.path} from ${parsed.ip} actor:${actorId}`);
     
-    // Immediately process request (blocking or non-blocking)
+    // Immediately process request with full context for behavioral scoring
+    const userAgent = req.headers['user-agent'] || '';
+    const hasAuth = !!(req.headers['authorization'] || req.headers['x-api-key']);
+    const headerKeys = Object.keys(req.headers);
+
     const result = await workerManager.processRequest({
       ip: parsed.ip,
       actorId: actorId,
       method: parsed.method,
       path: parsed.path,
+      userAgent: userAgent,
+      hasAuth: hasAuth,
+      headers: headerKeys,
     });
 
     console.log(`[Server] Pipeline result: action=${result.action} reason=${result.reason}`);
@@ -158,11 +165,29 @@ function parseRequest(req) {
   };
 }
 
+// Bot UA patterns that indicate automation tools
+const BOT_UA_GROUP_PATTERNS = [
+  'python-requests', 'python-urllib', 'python-httpx',
+  'curl/', 'wget/', 'httpie/',
+  'go-http-client', 'java/', 'okhttp/',
+  'scrapy', 'selenium', 'puppeteer', 'playwright',
+  'headlesschrome', 'phantomjs',
+  'spider', 'scraper', 'crawler', 'bot',
+  'apache-httpclient', 'libwww-perl',
+];
+
 function generateFingerprint(req) {
   const ip = req.ip || req.headers['x-forwarded-for'] || '127.0.0.1';
   const ua = req.headers['user-agent'] || '';
   const auth = req.headers['authorization'] || '';
-  const raw = ip + ua + auth;
+  const uaLower = ua.toLowerCase();
+
+  // For bot-like UAs: group by UA pattern (ignore IP)
+  // This catches IP-rotating attackers using the same tool
+  const isBotUA = BOT_UA_GROUP_PATTERNS.some(p => uaLower.includes(p));
+
+  // Group key: for bots use just the UA; for humans use IP+UA+auth
+  const raw = isBotUA ? ('bot:' + ua) : (ip + ua + auth);
   let hash = 0;
   for (let i = 0; i < raw.length; i++) {
     hash = ((hash << 5) - hash) + raw.charCodeAt(i);
