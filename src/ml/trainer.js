@@ -7,7 +7,7 @@
 // The model learns to distinguish them through gradient descent.
 // ═══════════════════════════════════════════════════════════════
 import { extractFeatures, FEATURE_COUNT } from './featureExtractor.js';
-import detector, { ATTACK_TYPES, NUM_CLASSES } from './model.js';
+import detector, { ATTACK_TYPES, NUM_CLASSES, BODY_SHAPES, pick } from './constants.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
@@ -88,7 +88,7 @@ function generateSession(pattern) {
       headerCount: gen.headerCount ? randInt(gen.headerCount.min, gen.headerCount.max) : randInt(10, 16),
       missingHeaders: gen.missingHeaders || [] 
     },
-    bodyShapes: ['empty'],
+    bodyShapes: BODY_SHAPES[pattern.label] || BODY_SHAPES.normal,
   };
   
   // Generate endpoints

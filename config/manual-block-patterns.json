@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "ip": "1.2.3.4",
+    "blockedAt": "2026-04-11T01:32:29.941Z",
+    "userAgents": [],
+    "methods": [],
+    "endpoints": [],
+    "pathPatterns": []
+  },
+  {
+    "ip": "5.5.5.5",
+    "blockedAt": "2026-04-11T01:33:50.015Z",
+    "userAgents": [],
+    "methods": [],
+    "endpoints": [],
+    "pathPatterns": []
+  },
+  {
+    "ip": "8.8.8.8",
+    "blockedAt": "2026-04-11T01:34:31.653Z",
+    "userAgents": [],
+    "methods": [],
+    "endpoints": [],
+    "pathPatterns": []
+  },
+  {
+    "ip": "7.7.7.7",
+    "blockedAt": "2026-04-11T01:37:48.782Z",
+    "userAgents": [],
+    "methods": [],
+    "endpoints": [],
+    "pathPatterns": []
+  },
+  {
+    "ip": "9.9.9.99",
+    "blockedAt": "2026-04-11T01:39:57.923Z",
+    "userAgents": [],
+    "methods": [
+      "GET"
+    ],
+    "endpoints": [
+      "/api/users/1",
+      "/api/users/2",
+      "/api/users/3"
+    ],
+    "pathPatterns": [
+      "/api/users/:id"
+    ]
+  }
+]

@@ -10,7 +10,463 @@
   },
   "rulesFilePath": "",
   "importedRules": [],
-  "rules": [],
+  "rules": [
+    {
+      "id": "rule-1775871271656",
+      "pattern": "8.8.8.8",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: manual test",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "8.8.8.8"
+      ],
+      "weight": 50,
+      "createdAt": "2026-04-11T01:34:31.656Z",
+      "updatedAt": "2026-04-11T01:34:31.656Z"
+    },
+    {
+      "id": "rule-1775871468785",
+      "pattern": "7.7.7.7",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: test pattern",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "7.7.7.7"
+      ],
+      "weight": 50,
+      "createdAt": "2026-04-11T01:37:48.785Z",
+      "updatedAt": "2026-04-11T01:37:48.785Z"
+    },
+    {
+      "id": "rule-1775871597926",
+      "pattern": "9.9.9.99",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: test patterns",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "9.9.9.99"
+      ],
+      "weight": 50,
+      "createdAt": "2026-04-11T01:39:57.926Z",
+      "updatedAt": "2026-04-11T01:39:57.926Z"
+    },
+    {
+      "id": "rule-1775872045549",
+      "pattern": "130.217.99.217",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "130.217.99.217"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:25.549Z",
+      "updatedAt": "2026-04-11T01:47:25.549Z"
+    },
+    {
+      "id": "rule-1775872045554",
+      "pattern": "44.167.129.108",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "44.167.129.108"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:25.554Z",
+      "updatedAt": "2026-04-11T01:47:25.554Z"
+    },
+    {
+      "id": "rule-1775872046142",
+      "pattern": "30.10.25.217",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "30.10.25.217"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:26.142Z",
+      "updatedAt": "2026-04-11T01:47:26.142Z"
+    },
+    {
+      "id": "rule-1775872046853",
+      "pattern": "71.119.145.125",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "71.119.145.125"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:26.853Z",
+      "updatedAt": "2026-04-11T01:47:26.853Z"
+    },
+    {
+      "id": "rule-1775872047015",
+      "pattern": "189.73.182.20",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "189.73.182.20"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:27.015Z",
+      "updatedAt": "2026-04-11T01:47:27.015Z"
+    },
+    {
+      "id": "rule-1775872047060",
+      "pattern": "145.79.32.140",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "145.79.32.140"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:27.060Z",
+      "updatedAt": "2026-04-11T01:47:27.060Z"
+    },
+    {
+      "id": "rule-1775872047123",
+      "pattern": "90.227.97.144",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "90.227.97.144"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:27.123Z",
+      "updatedAt": "2026-04-11T01:47:27.123Z"
+    },
+    {
+      "id": "rule-1775872047795",
+      "pattern": "203.45.67.89",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "203.45.67.89"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:27.795Z",
+      "updatedAt": "2026-04-11T01:47:27.795Z"
+    },
+    {
+      "id": "rule-1775872048008",
+      "pattern": "58.210.161.24",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "58.210.161.24"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:28.008Z",
+      "updatedAt": "2026-04-11T01:47:28.008Z"
+    },
+    {
+      "id": "rule-1775872048010",
+      "pattern": "119.166.178.38",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "119.166.178.38"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:28.010Z",
+      "updatedAt": "2026-04-11T01:47:28.010Z"
+    },
+    {
+      "id": "rule-1775872048263",
+      "pattern": "193.240.188.222",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "193.240.188.222"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:28.263Z",
+      "updatedAt": "2026-04-11T01:47:28.263Z"
+    },
+    {
+      "id": "rule-1775872048521",
+      "pattern": "122.215.105.99",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "122.215.105.99"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:28.521Z",
+      "updatedAt": "2026-04-11T01:47:28.521Z"
+    },
+    {
+      "id": "rule-1775872049146",
+      "pattern": "142.31.112.102",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "142.31.112.102"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:29.146Z",
+      "updatedAt": "2026-04-11T01:47:29.146Z"
+    },
+    {
+      "id": "rule-1775872049246",
+      "pattern": "183.77.152.154",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "183.77.152.154"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:29.246Z",
+      "updatedAt": "2026-04-11T01:47:29.246Z"
+    },
+    {
+      "id": "rule-1775872049303",
+      "pattern": "166.166.231.151",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "166.166.231.151"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:29.303Z",
+      "updatedAt": "2026-04-11T01:47:29.303Z"
+    },
+    {
+      "id": "rule-1775872050242",
+      "pattern": "236.228.151.120",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "236.228.151.120"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:30.242Z",
+      "updatedAt": "2026-04-11T01:47:30.242Z"
+    },
+    {
+      "id": "rule-1775872050250",
+      "pattern": "252.117.185.218",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "252.117.185.218"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:30.250Z",
+      "updatedAt": "2026-04-11T01:47:30.250Z"
+    },
+    {
+      "id": "rule-1775872050491",
+      "pattern": "110.179.173.26",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "110.179.173.26"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:30.491Z",
+      "updatedAt": "2026-04-11T01:47:30.491Z"
+    },
+    {
+      "id": "rule-1775872051651",
+      "pattern": "218.84.36.182",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "218.84.36.182"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:31.651Z",
+      "updatedAt": "2026-04-11T01:47:31.651Z"
+    },
+    {
+      "id": "rule-1775872051994",
+      "pattern": "51.176.245.235",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "51.176.245.235"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:31.994Z",
+      "updatedAt": "2026-04-11T01:47:31.994Z"
+    },
+    {
+      "id": "rule-1775872052582",
+      "pattern": "49.214.117.191",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "49.214.117.191"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:32.582Z",
+      "updatedAt": "2026-04-11T01:47:32.582Z"
+    },
+    {
+      "id": "rule-1775872053080",
+      "pattern": "96.33.22.152",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "96.33.22.152"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:33.080Z",
+      "updatedAt": "2026-04-11T01:47:33.080Z"
+    },
+    {
+      "id": "rule-1775872054217",
+      "pattern": "71.42.239.222",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "71.42.239.222"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:34.217Z",
+      "updatedAt": "2026-04-11T01:47:34.217Z"
+    },
+    {
+      "id": "rule-1775872054393",
+      "pattern": "31.30.91.106",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "31.30.91.106"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:34.393Z",
+      "updatedAt": "2026-04-11T01:47:34.393Z"
+    },
+    {
+      "id": "rule-1775872054683",
+      "pattern": "85.246.167.69",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "85.246.167.69"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:34.683Z",
+      "updatedAt": "2026-04-11T01:47:34.683Z"
+    },
+    {
+      "id": "rule-1775872055026",
+      "pattern": "206.249.251.210",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "206.249.251.210"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:47:35.026Z",
+      "updatedAt": "2026-04-11T01:47:35.026Z"
+    },
+    {
+      "id": "rule-1775872312318",
+      "pattern": "207.19.102.21",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "207.19.102.21"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:51:52.318Z",
+      "updatedAt": "2026-04-11T01:51:52.318Z"
+    },
+    {
+      "id": "rule-1775872364590",
+      "pattern": "240.241.64.81",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "240.241.64.81"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:52:44.590Z",
+      "updatedAt": "2026-04-11T01:52:44.590Z"
+    },
+    {
+      "id": "rule-1775872430312",
+      "pattern": "232.41.53.149",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "232.41.53.149"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:53:50.312Z",
+      "updatedAt": "2026-04-11T01:53:50.312Z"
+    },
+    {
+      "id": "rule-1775872488241",
+      "pattern": "94.154.101.155",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "94.154.101.155"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:54:48.241Z",
+      "updatedAt": "2026-04-11T01:54:48.241Z"
+    },
+    {
+      "id": "rule-1775872529985",
+      "pattern": "69.107.189.236",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "69.107.189.236"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:55:29.985Z",
+      "updatedAt": "2026-04-11T01:55:29.985Z"
+    },
+    {
+      "id": "rule-1775872531603",
+      "pattern": "161.195.207.62",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: distributed_attack",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "161.195.207.62"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T01:55:31.603Z",
+      "updatedAt": "2026-04-11T01:55:31.603Z"
+    }
+  ],
   "ollamaEndpoint": "http://localhost:11434",
   "ollamaModel": "llama3.2",
   "logging": {
@@ -26,7 +482,7 @@
     "rulesThreshold": 5,
     "forceFullRetrainEvery": 24,
     "trainingStatus": "completed",
-    "lastTrainedAt": "2026-04-11T01:05:53.146Z",
+    "lastTrainedAt": "2026-04-11T02:03:48.979Z",
     "nextScheduledAt": null,
     "rulesChangedSinceLastTrain": 0
   },

@@ -88,6 +88,7 @@ eventLog.on('event', (event) => {
 });
 
 // Express middleware
+app.set('trust proxy', true);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -121,6 +122,17 @@ app.all('/api/*', async (req, res, next) => {
     if (result.action === 'block') {
       res.status(403).json({
         error: 'BLOCKED',
+        reason: result.reason,
+      });
+      return;
+    }
+
+    // Throttle if action is throttle - return 429 Too Many Requests
+    if (result.action === 'throttle') {
+      const delay = result.score > 70 ? 1000 : 500;
+      await new Promise(r => setTimeout(r, delay));
+      res.status(429).json({
+        error: 'THROTTLED',
         reason: result.reason,
       });
       return;
@@ -260,7 +272,7 @@ app.post('/admin/blocked-ips', async (req, res) => {
 
 // Unblock an IP
 app.delete('/admin/blocked-ips/:ip', async (req, res) => {
-  const ip = req.params.ip;
+  const ip = decodeURIComponent(req.params.ip);
   try {
     const result = await workerManager.unblockIP({ ip });
     res.json(result);
@@ -593,14 +605,13 @@ async function start() {
     try {
       console.log('[Engine] Auto-starting pipeline...');
       
-      // Check workers are available
-      const status = await workerManager.getPipelineStatus();
-      console.log('[Engine] Pipeline status:', status);
-      
+      // Start pipeline directly in worker
       const result = await workerManager.startPipeline();
-      console.log('[Engine] Pipeline start result:', result);
-      pipelineActive = result.active !== false;
-      console.log('[Engine] Pipeline auto-started for immediate protection, active:', pipelineActive);
+      console.log('[Engine] Pipeline start result:', JSON.stringify(result));
+      
+      // Ensure it's marked active
+      pipelineActive = true;
+      console.log('[Engine] Pipeline activated:', pipelineActive);
     } catch (e) {
       console.log('[Engine] Pipeline start deferred:', e.message);
     }

@@ -942,13 +942,39 @@
     }
 
     function validateIPInput(input) {
-      if (isIPRange(input)) return true;
-      const parts = input.split('.');
-      if (parts.length !== 4) return false;
-      return parts.every(p => {
-        const n = parseInt(p, 10);
-        return !isNaN(n) && n >= 0 && n <= 255 && /^0?\d+$/.test(p);
-      });
+      if (!input || typeof input !== 'string') return false;
+      const trimmed = input.trim();
+      if (!trimmed) return false;
+      
+      // Check for IP range (wildcard or CIDR)
+      if (isIPRange(trimmed)) return true;
+      
+      // Strict regex for single IP: exactly 4 octets, each 0-255, no leading zeros
+      const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      return ipRegex.test(trimmed);
+    }
+
+    function isIPRange(input) {
+      if (!input || typeof input !== 'string') return false;
+      const trimmed = input.trim();
+      
+      // Wildcard: x.x.x.x, x.x.x.*, 1.2.3.x, 1.2.x.x
+      const wildcardRegex = /^(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/;
+      if (wildcardRegex.test(trimmed)) {
+        const parts = trimmed.split('.');
+        return parts.every(p => p === '*' || (parseInt(p) >= 0 && parseInt(p) <= 255));
+      }
+      
+      // CIDR: 192.168.1.0/24
+      const cidrRegex = /^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/;
+      if (cidrRegex.test(trimmed)) {
+        const [ip, mask] = trimmed.split('/');
+        const ipParts = ip.split('.').map(Number);
+        const maskNum = parseInt(mask);
+        return ipParts.every(p => p >= 0 && p <= 255) && maskNum >= 0 && maskNum <= 32;
+      }
+      
+      return false;
     }
 
     function isIPRange(input) {
@@ -962,12 +988,12 @@
 
     async function unblockIPFromTable(ip) {
       try {
-        const res = await fetch('/admin/blocked-ips/' + ip, { method: 'DELETE' });
+        const res = await fetch('/admin/blocked-ips/' + encodeURIComponent(ip), { method: 'DELETE' });
         const result = await res.json();
         if (result.success) {
-          showAlert('IP ' + ip + ' unblocked');
-          loadBlockedIPs();
-          loadEvents();
+          state.blockedIPs.delete(ip);
+          updateBlockedIPsTable();
+          showAlert((result.unblockedCount ? result.unblockedCount + ' IPs' : 'IP') + ' unblocked');
         } else { showAlert(result.error || 'Failed to unblock'); }
       } catch (e) { showAlert('Error: ' + e.message); }
     }
@@ -1055,7 +1081,7 @@
           addTrafficBucket(now, 'allowed');
           break;
         case 'enforcement':
-          if (event.action === 'block') { state.blocked++; addTrafficBucket(now, 'blocked'); showAlert('BLOCKED ' + (event.actorId ? event.actorId.substring(0,8) : 'unknown')); }
+          if (event.action === 'block') { state.blocked++; addTrafficBucket(now, 'blocked'); }
           else if (event.action === 'throttle') { state.throttled++; addTrafficBucket(now, 'throttled'); }
           else if (event.action === 'monitor') { state.monitored++; addTrafficBucket(now, 'monitored'); }
           // allow events already counted via 'request' type, don't double count
@@ -1069,7 +1095,6 @@
           break;
         case 'assessment':
           if (event.actorId) trackActor(event.actorId, { lastScore: event.score, classification: event.classification, lastAction: event.action });
-          if (event.score >= 85) showAlert('HIGH THREAT: ' + (event.actorId ? event.actorId.substring(0,8) : 'unknown') + ' - ' + event.classification);
           break;
       }
       if (event.type !== 'request') {

@@ -6,6 +6,7 @@
 // Features are designed to capture bot-vs-human behavioral signals
 // without encoding any attack rules — the model learns patterns.
 // ═══════════════════════════════════════════════════════════════
+import { BOT_UA_PATTERNS, BROWSER_HEADERS } from './constants.js';
 
 // Feature indices (for documentation — the model just sees numbers)
 export const FEATURE_NAMES = [
@@ -34,30 +35,6 @@ export const FEATURE_NAMES = [
 export const FEATURE_COUNT = FEATURE_NAMES.length;
 
 // Known bot/automation User-Agent fragments
-const BOT_UA_PATTERNS = [
-  'python-requests', 'python-urllib', 'python-httpx',
-  'curl/', 'wget/', 'httpie/',
-  'go-http-client', 'java/', 'okhttp/',
-  'scrapy', 'selenium', 'puppeteer', 'playwright',
-  'headlesschrome', 'phantomjs',
-  'bot', 'crawler', 'spider', 'scraper',
-  'apache-httpclient', 'axios/', 'node-fetch',
-  'databot', 'libwww-perl',
-];
-
-// Headers a real browser normally sends
-const BROWSER_HEADERS = [
-  'accept-language',
-  'sec-ch-ua',
-  'sec-ch-ua-mobile',
-  'sec-ch-ua-platform',
-  'sec-fetch-dest',
-  'sec-fetch-mode',
-  'sec-fetch-site',
-  'upgrade-insecure-requests',
-  'cache-control',
-];
-
 /**
  * Extract a numerical feature vector from a session analysis object.
  * Returns a Float32Array of length FEATURE_COUNT.
@@ -133,11 +110,11 @@ export function extractFeatures(analysis) {
   // 16: Sequential ID pattern detection
   features[16] = detectSequentialPattern(endpoints) ? 1 : 0;
 
-  // 17: Query param diversity
-  features[17] = 0; // Would need per-request data
+  // 17: Query param diversity (computed in sessionBuffer)
+  features[17] = analysis.queryParamDiversity || 0;
 
-  // 18: Error rate (placeholder — filled when response data available)
-  features[18] = 0;
+  // 18: Error rate (computed in sessionBuffer from response status codes)
+  features[18] = analysis.errorRate || 0;
 
   // 19: Burst score — how concentrated are requests in small time windows
   features[19] = computeBurstScore(analysis.intervals || []);
@@ -169,6 +146,41 @@ export function extractRequestFeatures(parsed, sessionHistory = []) {
     features[2] = clamp(stddev / 5000, 0, 1);
     features[3] = mean > 0 ? clamp(stddev / mean, 0, 2) / 2 : 0;
     features[19] = computeBurstScore(intervals);
+
+    // Feature 4: Endpoint diversity from history
+    const endpoints = sessionHistory.map(r => r.path);
+    const uniqueEndpoints = new Set(endpoints);
+    features[4] = clamp(uniqueEndpoints.size / sessionHistory.length, 0, 1);
+
+    // Feature 5: Is single endpoint (all same)
+    features[5] = uniqueEndpoints.size === 1 ? 1 : 0;
+
+    // Feature 14: Body shape diversity from history
+    const bodyShapes = sessionHistory.map(r => r.bodyShape).filter(s => s);
+    const uniqueBodyShapes = new Set(bodyShapes);
+    features[14] = bodyShapes.length > 0 ? clamp(uniqueBodyShapes.size / bodyShapes.length, 0, 1) : 0;
+
+    // Feature 15: IP count from history
+    const ips = sessionHistory.map(r => r.ip).filter(ip => ip);
+    const uniqueIPs = new Set(ips);
+    features[15] = clamp(uniqueIPs.size / 10, 0, 1);
+
+    // Feature 16: Sequential ID pattern from history
+    features[16] = detectSequentialPattern(endpoints) ? 1 : 0;
+
+    // Feature 17: Query param diversity from history
+    const allQueryKeys = new Set();
+    let totalParams = 0;
+    for (const r of sessionHistory) {
+      if (r.queryKeys && Array.isArray(r.queryKeys)) {
+        r.queryKeys.forEach(k => allQueryKeys.add(k));
+        totalParams += r.queryKeys.length;
+      }
+    }
+    features[17] = totalParams > 0 ? clamp(allQueryKeys.size / totalParams, 0, 1) : 0;
+
+    // Feature 18: Error rate (no history, default to 0)
+    features[18] = 0;
   }
 
   // Method
@@ -177,6 +189,9 @@ export function extractRequestFeatures(parsed, sessionHistory = []) {
 
   // Auth
   features[8] = parsed.authType !== 'none' ? 1 : 0;
+
+  // Feature 9: Auth type count (default to 1 if has auth, 0 if none)
+  features[9] = parsed.authType !== 'none' ? 1 : 0;
 
   // Headers
   features[10] = clamp((parsed.headerSignature?.headerCount || 0) / 20, 0, 1);

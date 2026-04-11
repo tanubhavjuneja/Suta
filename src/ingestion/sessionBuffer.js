@@ -111,11 +111,17 @@ class SessionBuffer {
       ips,
       ipCount: ips.length,
 
-      // Content
-      bodyShapes,
-      userAgent: requests[0]?.userAgent || 'unknown',
+    // Content
+    bodyShapes,
+    userAgent: requests[0]?.userAgent || 'unknown',
 
-      // Header analysis
+    // Query param diversity
+    queryParamDiversity: this._computeQueryParamDiversity(requests),
+
+    // Error rate (4xx + 5xx responses)
+    errorRate: this._computeErrorRate(requests),
+
+    // Header analysis
       headerSignature: requests[0]?.headerSignature || null,
 
       // Samples (first 5 for the observation report)
@@ -148,6 +154,29 @@ class SessionBuffer {
     const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
     const variance = arr.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / arr.length;
     return Math.round(Math.sqrt(variance));
+  }
+
+  _computeQueryParamDiversity(requests) {
+    const allKeys = new Set();
+    let totalParams = 0;
+    for (const req of requests) {
+      if (req.queryKeys && Array.isArray(req.queryKeys)) {
+        req.queryKeys.forEach(k => allKeys.add(k));
+        totalParams += req.queryKeys.length;
+      }
+    }
+    if (totalParams === 0) return 0;
+    return allKeys.size / Math.max(totalParams, 1);
+  }
+
+  _computeErrorRate(requests) {
+    let errorCount = 0;
+    for (const req of requests) {
+      if (req.status && req.status >= 400) {
+        errorCount++;
+      }
+    }
+    return requests.length > 0 ? errorCount / requests.length : 0;
   }
 
   _expire(actorId) {

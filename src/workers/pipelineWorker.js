@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CONFIG_DIR = path.join(__dirname, '../../config');
 const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MINUTES || '5', 10) * 60 * 1000;
-const SESSION_BUFFER_THRESHOLD = parseInt(process.env.SESSION_BUFFER_THRESHOLD || '5', 10);
+const SESSION_BUFFER_THRESHOLD = parseInt(process.env.SESSION_BUFFER_THRESHOLD || '3', 10);
 
 class PipelineWorker {
   constructor() {
@@ -159,8 +159,9 @@ class PipelineWorker {
     // Check if IP is blocked
     if (this.isIPBlocked(ip)) {
       const entry = this.blockedIPs.get(ip);
+      // Throttle instead of block for existing blocklist entries (avoid false positives)
       return {
-        action: 'block',
+        action: 'throttle',
         reason: 'ip_blocked',
         blockedEntry: entry,
       };
@@ -174,12 +175,11 @@ class PipelineWorker {
         const score = cached.assessment.threat_score;
         const recommended = cached.assessment.recommended_action;
         
-        // Block if high score or recommended action
+        // Throttle on high ML score - never block to avoid false positives
         if (recommended === 'block' || score >= 85) {
-          this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: 'ml_blocked', score, timestamp: new Date().toISOString() });
-          return { action: 'block', reason: 'ml_blocked', score };
+          this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'ml_blocked', score, timestamp: new Date().toISOString() });
+          return { action: 'throttle', reason: 'ml_blocked', score };
         }
-        // Throttle if medium score
         if (recommended === 'throttle' || score >= 70) {
           this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'ml_throttled', score, timestamp: new Date().toISOString() });
           return { action: 'throttle', reason: 'ml_throttled', score };
@@ -197,32 +197,31 @@ class PipelineWorker {
     const timestamps = this.requestTimestamps.get(actorId);
     timestamps.push(now);
     
-    // Keep only last 10 seconds of timestamps
-    while (timestamps.length > 0 && timestamps[0] < now - 10000) {
+    // Keep only last 3 seconds of timestamps (very sensitive)
+    while (timestamps.length > 0 && timestamps[0] < now - 3000) {
       timestamps.shift();
     }
     this.requestTimestamps.set(actorId, timestamps);
     
-    // Block if more than 10 requests per second (fast bots)
-    if (timestamps.length > 10) {
-      this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: 'rate_exceeded', score: 95, timestamp: new Date().toISOString() });
-      return { action: 'block', reason: 'rate_exceeded', score: 95 };
+    // Higher thresholds to reduce false positives on normal users
+    // Throttle at very high rates (12+ req in 3 seconds = 4 req/s)
+    if (timestamps.length > 12) {
+      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_exceeded', score: 75, timestamp: new Date().toISOString() });
+      return { action: 'throttle', reason: 'rate_exceeded', score: 75 };
     }
-    // Throttle if more than 5 requests per second
-    if (timestamps.length > 5) {
-      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_high', score: 75, timestamp: new Date().toISOString() });
-      return { action: 'throttle', reason: 'rate_high', score: 75 };
+    // Throttle at moderately high rates (7+ req in 3 seconds = 2.3 req/s)
+    if (timestamps.length > 7) {
+      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_high', score: 50, timestamp: new Date().toISOString() });
+      return { action: 'throttle', reason: 'rate_high', score: 50 };
     }
 
-    // Distributed attack detection - track all IPs in last 10 seconds
-    // Add current IP FIRST, then count
+    // Distributed attack detection - track all IPs in last 3 seconds
     if (!this.ipRequestTimestamps) this.ipRequestTimestamps = new Map();
-    const tenSecAgo = now - 10000;
+    const threeSecAgo = now - 3000;
     
-    // Clean up old entries and build current set
     const activeIPs = new Set();
     for (const [trackedIP, tsList] of this.ipRequestTimestamps) {
-      const recent = tsList.filter(t => t > tenSecAgo);
+      const recent = tsList.filter(t => t > threeSecAgo);
       if (recent.length > 0) {
         this.ipRequestTimestamps.set(trackedIP, recent);
         activeIPs.add(trackedIP);
@@ -231,19 +230,13 @@ class PipelineWorker {
       }
     }
     
-    // Add current request's IP
     activeIPs.add(ip);
     this.ipRequestTimestamps.set(ip, [...(this.ipRequestTimestamps.get(ip) || []), now]);
     
-    // Block if more than 5 unique IPs in 10 seconds (distributed attack)
-    if (activeIPs.size > 5) {
-      this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: 'distributed_attack', score: 90, timestamp: new Date().toISOString() });
-      return { action: 'block', reason: 'distributed_attack', score: 90 };
-    }
-    // Throttle if more than 3 unique IPs
-    if (activeIPs.size > 3) {
-      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'distributed_scan', score: 70, timestamp: new Date().toISOString() });
-      return { action: 'throttle', reason: 'distributed_scan', score: 70 };
+    // Throttle at very high IP count (15+ unique IPs in 3 seconds)
+    if (activeIPs.size > 15) {
+      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'distributed_scan', score: 50, timestamp: new Date().toISOString() });
+      return { action: 'throttle', reason: 'distributed_scan', score: 50 };
     }
 
 // Buffer request for session analysis
@@ -301,12 +294,15 @@ class PipelineWorker {
   blockIP({ ip, actorId, reason, score = 50, manualBlock = false }) {
     const isRange = this.isIPRange(ip);
     const existing = this.blockedIPs.get(ip);
+    const isNewBlock = !existing;
+    let entry = existing;
+    
     if (existing) {
       existing.score = Math.max(existing.score, score);
       existing.blockedAt = new Date().toISOString();
       existing.expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
     } else {
-      const entry = {
+      entry = {
         ip,
         ipRange: isRange,
         rangeStart: isRange ? this.getIPRangeStart(ip) : null,
@@ -349,7 +345,7 @@ class PipelineWorker {
     this.saveBlockedIPs();
 
     const type = isRange ? 'IP range' : 'IP';
-    this.log(`${type} blocked: ${ip} (${entry.rangeSize} addresses, reason: ${reason}, manual: ${manualBlock})`);
+    this.log(`${type} ${isNewBlock ? 'blocked' : 'updated'}: ${ip} (${entry.rangeSize || 1} addresses, reason: ${reason}, manual: ${manualBlock})`);
 
     parentPort.postMessage({
       type: 'ML_BLOCK_IP',
@@ -437,19 +433,48 @@ class PipelineWorker {
     for (const file of files.slice(-3)) {
       try {
         const content = fs.readFileSync(path.join(logsDir, file), 'utf8');
-        const lines = content.split('\n').filter(l => l.includes(targetIP));
+        // Filter by IP in JSON field OR X-Forwarded-For in the line
+        const lines = content.split('\n').filter(l => 
+          l.includes(`"ip":"${targetIP}"`) || 
+          l.includes(`"ip":"${targetIP.replace(/\./g, '\\.')}"`) ||
+          l.includes(`X-Forwarded-For`) && l.includes(targetIP)
+        );
         
         for (const line of lines.slice(-200)) {
-          const uaMatch = line.match(/User-Agent[":\s]+([^\n",]+)/i);
-          if (uaMatch) patterns.userAgents.add(uaMatch[1].trim());
+          let eventData = null;
+          
+          // Try to extract JSON from log line
+          const jsonMatch = line.match(/\{.+\}$/);
+          if (jsonMatch) {
+            try {
+              eventData = JSON.parse(jsonMatch[0]);
+            } catch (e) {}
+          }
 
-          const methodMatch = line.match(/\b(GET|POST|PUT|DELETE|PATCH)\b/i);
-          if (methodMatch) patterns.methods.add(methodMatch[1].toUpperCase());
+          if (eventData) {
+            if (eventData.userAgent) {
+              patterns.userAgents.add(eventData.userAgent);
+            }
+            if (eventData.method) {
+              patterns.methods.add(eventData.method.toUpperCase());
+            }
+            if (eventData.endpoint || eventData.path) {
+              const ep = eventData.endpoint || eventData.path;
+              patterns.endpoints.add(ep);
+              patterns.paths.push(ep);
+            }
+          } else {
+            const uaMatch = line.match(/User-Agent[":\s]+([^\n",]+)/i);
+            if (uaMatch) patterns.userAgents.add(uaMatch[1].trim());
 
-          const pathMatch = line.match(/\b\/api\/[^\s]*/i);
-          if (pathMatch) {
-            patterns.endpoints.add(pathMatch[0]);
-            patterns.paths.push(pathMatch[0]);
+            const methodMatch = line.match(/\b(GET|POST|PUT|DELETE|PATCH)\b/i);
+            if (methodMatch) patterns.methods.add(methodMatch[1].toUpperCase());
+
+            const pathMatch = line.match(/\b\/api\/[^\s]*/i);
+            if (pathMatch) {
+              patterns.endpoints.add(pathMatch[0]);
+              patterns.paths.push(pathMatch[0]);
+            }
           }
         }
       } catch (e) {}
