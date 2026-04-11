@@ -169,6 +169,7 @@
     .stat-card.warning .value { color: var(--accent-orange); }
     .stat-card.info .value { color: var(--accent-blue); }
     .stat-card.purple .value { color: var(--accent-purple); }
+    .stat-card.muted .value { color: var(--text-secondary); }
     
     /* Chart Grid */
     .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 22px; }
@@ -322,6 +323,11 @@
           <div class="delta" id="blockedPct">-</div>
         </div>
         <div class="stat-card warning">
+          <div class="label">Throttled</div>
+          <div class="value" id="throttledCount">0</div>
+          <div class="delta" id="throttledPct">-</div>
+        </div>
+        <div class="stat-card muted">
           <div class="label">Blocked IPs</div>
           <div class="value" id="blockedIPs">0</div>
         </div>
@@ -347,10 +353,14 @@
       <div class="tables-grid">
         <div class="table-card">
           <h3>Blocked IPs</h3>
+          <div style="display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--border-light);">
+            <input type="text" id="manualBlockIP" placeholder="Enter IP address" style="flex:1;padding:8px;border:1px solid var(--border-light);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;">
+            <button onclick="manualBlockIP()" style="padding:8px 16px;background:var(--accent-red);color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Block</button>
+          </div>
           <div class="table-scroll">
             <table>
-              <thead><tr><th>IP Address</th><th>Actor</th><th>Score</th><th>Time</th></tr></thead>
-              <tbody id="blockedIPsBody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr></tbody>
+              <thead><tr><th>IP Address</th><th>Actor</th><th>Score</th><th>Range</th><th>Source</th><th>Action</th></tr></thead>
+              <tbody id="blockedIPsBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -906,6 +916,62 @@
       } catch (e) { console.error('Failed to load blocked IPs:', e); }
     }
 
+    async function manualBlockIP() {
+      const ip = document.getElementById('manualBlockIP').value.trim();
+      if (!ip) { showAlert('Please enter an IP address'); return; }
+      
+      // Validate IP or IP range
+      const isValidIP = validateIPInput(ip);
+      if (!isValidIP) { showAlert('Invalid IP format. Use: 1.2.3.4 or 1.2.3.x or 1.2.x.x'); return; }
+      
+      try {
+        const res = await fetch('/admin/blocked-ips', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip, reason: 'Manual block by analyst', manual: true })
+        });
+        const result = await res.json();
+        if (result.success) {
+          const type = isIPRange(ip) ? 'IP range' : 'IP';
+          showAlert(type + ' ' + ip + ' blocked successfully');
+          document.getElementById('manualBlockIP').value = '';
+          loadBlockedIPs();
+          loadEvents();
+        } else { showAlert(result.error || 'Failed to block'); }
+      } catch (e) { showAlert('Error: ' + e.message); }
+    }
+
+    function validateIPInput(input) {
+      if (isIPRange(input)) return true;
+      const parts = input.split('.');
+      if (parts.length !== 4) return false;
+      return parts.every(p => {
+        const n = parseInt(p, 10);
+        return !isNaN(n) && n >= 0 && n <= 255 && /^0?\d+$/.test(p);
+      });
+    }
+
+    function isIPRange(input) {
+      return /\.(x|\*)$/.test(input) || /\/(\d+)$/.test(input);
+    }
+
+    function formatIPDisplay(ip) {
+      if (isIPRange(ip)) return ip;
+      return ip;
+    }
+
+    async function unblockIPFromTable(ip) {
+      try {
+        const res = await fetch('/admin/blocked-ips/' + ip, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          showAlert('IP ' + ip + ' unblocked');
+          loadBlockedIPs();
+          loadEvents();
+        } else { showAlert(result.error || 'Failed to unblock'); }
+      } catch (e) { showAlert('Error: ' + e.message); }
+    }
+
     function renderBlockedIPs(ips) {
       const container = document.getElementById('blockedIPsList');
       if (!ips || ips.length === 0) {
@@ -979,18 +1045,21 @@
 
     // Event Processing
     function processEvent(event) {
+      console.log('Processing event:', event.type, event.action || '');
       const now = Math.floor(Date.now() / 1000);
       switch (event.type) {
         case 'request':
-          state.totalRequests++; state.allowed++;
+          console.log('Incrementing allowed');
+          state.allowed++;
           trackActor(event.actorId, { requests: 1 });
           addTrafficBucket(now, 'allowed');
           break;
         case 'enforcement':
-          if (event.action === 'block') { state.blocked++; state.allowed = Math.max(0, state.allowed - 1); addTrafficBucket(now, 'blocked'); showAlert('BLOCKED ' + (event.actorId ? event.actorId.substring(0,8) : 'unknown')); }
-          else if (event.action === 'throttle') state.throttled++;
-          else if (event.action === 'monitor') state.monitored++;
-          if (event.actorId) trackActor(event.actorId, { lastAction: event.action, lastScore: event.score });
+          if (event.action === 'block') { state.blocked++; addTrafficBucket(now, 'blocked'); showAlert('BLOCKED ' + (event.actorId ? event.actorId.substring(0,8) : 'unknown')); }
+          else if (event.action === 'throttle') { state.throttled++; addTrafficBucket(now, 'throttled'); }
+          else if (event.action === 'monitor') { state.monitored++; addTrafficBucket(now, 'monitored'); }
+          // allow events already counted via 'request' type, don't double count
+          if (event.actorId && event.action !== 'allow') trackActor(event.actorId, { lastAction: event.action, lastScore: event.score });
           break;
         case 'ml_score':
           if (event.actorId) trackActor(event.actorId, { lastMl: event.ml_risk_score });
@@ -1045,15 +1114,18 @@
 
     // UI Updates
     function updateUI() {
-      document.getElementById('totalRequests').textContent = state.totalRequests;
+      const total = state.allowed + state.blocked + state.throttled + state.monitored;
+      document.getElementById('totalRequests').textContent = total;
       document.getElementById('allowedCount').textContent = state.allowed;
       document.getElementById('blockedCount').textContent = state.blocked;
+      document.getElementById('throttledCount').textContent = state.throttled;
       document.getElementById('blockedIPs').textContent = state.blockedIPs.size;
       document.getElementById('activeActors').textContent = state.actors.size;
-      const total = state.totalRequests || 1;
-      document.getElementById('allowedPct').textContent = ((state.allowed/total)*100).toFixed(1) + '%';
-      document.getElementById('blockedPct').textContent = ((state.blocked/total)*100).toFixed(1) + '%';
-      document.getElementById('totalRequestsDelta').textContent = (state.totalRequests / Math.max(1, (Date.now() - state.startTime) / 1000)).toFixed(1) + ' r/s';
+      const totalForPct = total || 1;
+      document.getElementById('allowedPct').textContent = ((state.allowed/totalForPct)*100).toFixed(1) + '%';
+      document.getElementById('blockedPct').textContent = ((state.blocked/totalForPct)*100).toFixed(1) + '%';
+      document.getElementById('throttledPct').textContent = ((state.throttled/totalForPct)*100).toFixed(1) + '%';
+      document.getElementById('totalRequestsDelta').textContent = (total / Math.max(1, (Date.now() - state.startTime) / 1000)).toFixed(1) + ' r/s';
       
       enforcementChart.data.datasets[0].data = [state.allowed, state.blocked, state.throttled, state.monitored];
       enforcementChart.update('none');
@@ -1079,8 +1151,8 @@
     function updateBlockedIPsTable() {
       const body = document.getElementById('blockedIPsBody');
       const entries = Array.from(state.blockedIPs.values());
-      if (entries.length === 0) { body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr>'; return; }
-      body.innerHTML = entries.map(e => '<tr><td style="color:var(--accent-red)">' + e.ip + '</td><td>' + (e.actorId ? e.actorId.substring(0,10) : '-') + '</td><td>' + e.score + '</td><td>' + e.time + '</td></tr>').join('');
+      if (entries.length === 0) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No blocked IPs</td></tr>'; return; }
+      body.innerHTML = entries.map(e => '<tr><td style="color:var(--accent-red);font-family:monospace;">' + e.ip + '</td><td>' + (e.actorId ? e.actorId.substring(0,12) : '-') + '</td><td>' + e.score + '</td><td>' + (e.rangeSize > 1 ? '<span style="color:var(--accent-orange)">' + e.rangeSize + ' IPs</span>' : '-') + '</td><td><span class="badge ' + (e.manual ? 'badge-block' : 'badge-allow') + '">' + (e.manual ? 'Manual' : 'Auto') + '</span></td><td><button onclick="unblockIPFromTable(\'' + e.ip + '\')" style="padding:4px 8px;background:transparent;color:var(--accent-green-bright);border:1px solid var(--accent-green-bright);border-radius:4px;font-size:10px;cursor:pointer;">Unblock</button></td></tr>').join('');
     }
 
     function updateActorsTable() {

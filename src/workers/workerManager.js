@@ -29,7 +29,7 @@ class WorkerManager extends EventEmitter {
       });
 
       worker.on('exit', (code) => {
-        console.log(`[WorkerManager] ${name} exited with code ${code}`);
+        console.log(`[WorkerManager] ${name} exited with code ${code}, removing worker`);
         this.workers.delete(name);
         this.emit('worker_exit', { name, code });
       });
@@ -76,7 +76,14 @@ class WorkerManager extends EventEmitter {
     });
   }
 
-  handleWorkerMessage(workerName, msg) {
+  // Fire and forget - no response expected
+  postMessage(workerName, type, payload = {}) {
+    const worker = this.workers.get(workerName);
+    if (!worker) return;
+    worker.postMessage({ type, payload });
+  }
+
+handleWorkerMessage(workerName, msg) {
     const { type, id, result, payload } = msg;
 
     if (id && this.pendingMessages.has(id)) {
@@ -117,7 +124,14 @@ class WorkerManager extends EventEmitter {
     }
   }
 
-  getForwardTarget(sourceWorker, type) {
+getForwardTarget(sourceWorker, type) {
+    // Pipeline sends to ml or dashboard
+    if (sourceWorker === 'pipeline') {
+      if (type === 'ML_ASSESS_SESSION') return 'ml';
+      if (type === 'PIPELINE_TO_ML') return 'ml';
+      if (type === 'PIPELINE_TO_DASHBOARD') return 'dashboard';
+    }
+    // Standard routing
     if (type.startsWith('LOG_') && sourceWorker !== 'logging') return 'logging';
     if (type.startsWith('ML_') && sourceWorker !== 'ml') return 'ml';
     if (type.startsWith('PIPELINE_') && sourceWorker !== 'pipeline') return 'pipeline';
@@ -125,29 +139,22 @@ class WorkerManager extends EventEmitter {
     return null;
   }
 
-  forwardWorkerMessage(sourceWorker, targetWorker, msg) {
+forwardWorkerMessage(sourceWorker, targetWorker, msg) {
     const worker = this.workers.get(targetWorker);
     if (!worker) {
+      console.log(`[WM] Forward failed: no worker ${targetWorker}`);
       return;
     }
 
-    if (msg.id) {
-      const relayId = `relay-${++this.relayMessageId}`;
-      this.pendingRelays.set(relayId, {
-        sourceWorker,
-        sourceId: msg.id,
-      });
-
-      worker.postMessage({
-        type: msg.type,
-        id: relayId,
-        payload: msg.payload,
-      });
-      return;
+    // Debug: log pipeline to dashboard messages
+    if (sourceWorker === 'pipeline' && targetWorker === 'dashboard') {
+      console.log(`[WM] Pipeline->Dashboard: ${msg.type}`, JSON.stringify(msg.payload).substring(0, 80));
     }
 
+    // Pass through with original ID - don't relay
     worker.postMessage({
       type: msg.type,
+      id: msg.id,
       payload: msg.payload,
     });
   }
@@ -254,6 +261,10 @@ class WorkerManager extends EventEmitter {
 
   async getRulesByIP(ip) {
     return this.sendMessage('dashboard', 'DASHBOARD_GET_RULES_BY_IP', { ip });
+  }
+
+  async sendEvent(payload) {
+    return this.sendMessage('dashboard', 'DASHBOARD_SEND_EVENT', payload);
   }
 
   async addEvent(payload) {

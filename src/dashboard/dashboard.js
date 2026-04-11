@@ -41,7 +41,9 @@
 
     ws.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
+      console.log('WS received:', data.type, data.event?.type, data.event?.action);
       if (data.type === 'history') {
+        console.log('History events:', data.events.length);
         data.events.forEach(addEvent);
       } else if (data.type === 'event') {
         addEvent(data.event);

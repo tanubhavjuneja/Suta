@@ -111,20 +111,76 @@ const memoryLayer = {
   /**
    * Store a full session analysis (heavyweight, after buffer threshold)
    * Now includes ML output in the report prose.
+   * If actor already exists in Hindsight (passed via recallResult or checked),
+   * update with new IP addresses instead of creating duplicate.
    */
-  async retainSession(analysis, mlResult = null) {
+  async retainSession(analysis, mlResult = null, existingRecallResult = null) {
     const report = composeSessionReport(analysis, mlResult);
+    const actorId = analysis.actorId;
+    const newIPs = analysis.ips || [];
+
+    // Check if actor already exists - use passed recall result or query
+    let existingIPs = [];
+    let isUpdate = false;
+
+    if (existingRecallResult?.results?.length > 0) {
+      isUpdate = true;
+      const existing = existingRecallResult.results[0];
+      const metadataIP = existing.metadata?.ip_addresses;
+      if (metadataIP) {
+        if (typeof metadataIP === 'string') {
+          existingIPs = metadataIP.split(',').map(ip => ip.trim()).filter(ip => ip);
+        } else if (Array.isArray(metadataIP)) {
+          existingIPs = metadataIP;
+        }
+      }
+    } else {
+      // No recall result passed - check directly
+      try {
+        const recallResult = await hindsight.recall(
+          `Threat actor profile for ${actorId}`,
+          {
+            types: ['observation'],
+            tags: [`actor:${actorId}`],
+            tagsMatch: 'any_strict',
+            budget: 'low',
+          }
+        );
+
+        if (recallResult?.results?.length > 0) {
+          isUpdate = true;
+          const existing = recallResult.results[0];
+          const metadataIP = existing.metadata?.ip_addresses;
+          if (metadataIP) {
+            if (typeof metadataIP === 'string') {
+              existingIPs = metadataIP.split(',').map(ip => ip.trim()).filter(ip => ip);
+            } else if (Array.isArray(metadataIP)) {
+              existingIPs = metadataIP;
+            }
+          }
+        }
+      } catch (e) {
+        // Continue with new retain if recall fails
+      }
+    }
+
+    // Merge IPs - combine existing + new, remove duplicates
+    const allIPs = [...new Set([...existingIPs, ...newIPs])];
+    const ipListStr = allIPs.join(', ');
+
+    // Mark in report if this is an update
+    analysis.isUpdate = isUpdate;
 
     return hindsight.retain(report, {
       context: 'api-abuse-session-report',
-      documentId: `session-${analysis.sessionId}`,
+      documentId: `actor-${actorId}`,
       tags: [
-        `actor:${analysis.actorId}`,
+        `actor:${actorId}`,
       ],
       observationScopes: 'per_tag',
       entities: [
-        { text: analysis.actorId, type: 'THREAT_ACTOR' },
-        ...analysis.ips.map((ip) => ({ text: ip, type: 'IP_ADDRESS' })),
+        { text: actorId, type: 'THREAT_ACTOR' },
+        ...allIPs.map((ip) => ({ text: ip, type: 'IP_ADDRESS' })),
       ],
       metadata: {
         source: 'session-analysis',
@@ -133,6 +189,8 @@ const memoryLayer = {
         avgIntervalMs: String(analysis.avgIntervalMs),
         ml_risk_score: mlResult?.ml_risk_score?.toString() || 'n/a',
         ml_attack_type: mlResult?.attack_type || 'n/a',
+        ip_addresses: ipListStr,
+        existing_actor: isUpdate ? 'true' : 'false',
       },
     });
   },

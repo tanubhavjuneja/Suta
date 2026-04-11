@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDefaultConfig, mergeConfig } from '../configDefaults.js';
+import { createAttackClassifier } from '../ml/attackClassifier.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +29,7 @@ class MLWorker {
     this.config = createDefaultConfig();
     this.trainingTimer = null;
     this.analysisTimer = null;
+    this.attackClassifier = createAttackClassifier();
     this.init();
   }
 
@@ -107,6 +109,17 @@ class MLWorker {
           case 'ML_UNBLOCK_IP':
             result = this.handleIpUnblock(payload);
             break;
+
+          case 'ML_ASSESS_SESSION':
+          case 'ML_SESSION_ASSESS':
+            result = await this.assessSession(payload);
+            // Send back via workerManager - workerManager forwards to pipeline
+            // The message will be handled by pipeline's message handler
+            return result;
+            
+          case 'PIPELINE_TO_ML':
+            result = await this.assessSession(payload);
+            return result;
 
           default:
             result = { success: false, error: `Unknown type: ${type}` };
@@ -755,6 +768,128 @@ If no new rules needed, return empty array [].`;
     this.logAdmin({ event: 'ip_unblocked', ip });
 
     return { success: true };
+  }
+
+  async assessSession(payload) {
+    const { actorId, requests, ip } = payload;
+    
+    // Use attack classifier (MSCT-based) if model not available
+    if (!this.model || !this.modelLoaded) {
+      try {
+        const reqData = {
+          ip,
+          actorId,
+          method: requests[0]?.method || 'GET',
+          path: requests[0]?.endpoint || '/',
+          headers: {},
+          body: null,
+        };
+        
+        const result = await this.attackClassifier.classifyRequest(reqData);
+        
+        return {
+          success: true,
+          assessment: {
+            threat_score: result.threat_score,
+            classification: result.attack_type,
+            confidence: Math.round(result.confidence * 100),
+            recommended_action: result.recommended_action,
+            reasoning: `MSCT classifier detected ${result.attack_type} with score ${result.threat_score}`,
+            method: 'msct_classifier',
+          },
+        };
+      } catch (e) {
+        return { success: false, error: e.message };
+      }
+    }
+
+    // Extract features from session requests
+    const requestCount = requests.length;
+    const endpoints = [...new Set(requests.map(r => r.endpoint))];
+    const methods = [...new Set(requests.map(r => r.method))];
+    
+    // Calculate timing features
+    const times = requests.map(r => r.time).sort((a, b) => a - b);
+    const intervals = [];
+    for (let i = 1; i < times.length; i++) {
+      intervals.push(times[i] - times[i - 1]);
+    }
+    const avgInterval = intervals.length > 0 
+      ? intervals.reduce((a, b) => a + b, 0) / intervals.length 
+      : 0;
+    const stdDev = intervals.length > 1
+      ? Math.sqrt(intervals.map(x => Math.pow(x - avgInterval, 2)).reduce((a, b) => a + b, 0) / intervals.length)
+      : 0;
+
+    // Build feature vector
+    const features = [
+      Math.min(requestCount / 100, 1),                    // request_count (normalized)
+      Math.min(endpoints.length / 20, 1),                // endpoint_diversity
+      stdDev / 1000,                                  // interval_std
+      avgInterval / 5000,                             // interval_mean
+      0.3,                                           // auth_present (default - unknown)
+      0.1,                                           // header_anomaly
+      0.1,                                           // body_anomaly
+      stdDev < 50 ? 0.8 : 0.2,                      // rate_burst (very consistent = bot)
+      0.2,                                           // ip_variance
+    ];
+
+    try {
+      const prediction = await this.model.predict(tf.tensor2d([features]));
+      const probabilities = await prediction.data();
+      prediction.dispose();
+
+      // Find highest probability
+      const labels = ['normal', 'credential_stuffing', 'data_scraping', 'enumeration', 'rate_limit_evasion', 'api_fuzzing'];
+      let maxIdx = 0;
+      let maxProb = probabilities[0];
+      for (let i = 1; i < probabilities.length; i++) {
+        if (probabilities[i] > maxProb) {
+          maxProb = probabilities[i];
+          maxIdx = i;
+        }
+      }
+
+      const threatScore = Math.round(maxProb * 100);
+      const classification = labels[maxIdx] || 'unknown';
+      
+      // Determine recommended action based on threat score
+      let recommendedAction = 'allow';
+      if (threatScore >= 85) {
+        recommendedAction = 'block';
+      } else if (threatScore >= 70) {
+        recommendedAction = 'throttle';
+      } else if (threatScore >= 40) {
+        recommendedAction = 'monitor';
+      }
+
+      const assessment = {
+        threat_score: threatScore,
+        classification,
+        confidence: Math.round(maxProb * 100),
+        recommended_action: recommendedAction,
+        is_known_actor: false,
+        previous_sessions_estimate: 0,
+        reasoning: `ML model scored ${requestCount} requests from ${ip} as ${classification} (${threatScore}/100). Avg interval: ${avgInterval.toFixed(0)}ms, stddev: ${stdDev.toFixed(0)}ms.`,
+        behavioral_indicators: [
+          `${requestCount} requests`,
+          `${endpoints.length} unique endpoints`,
+          avgInterval < 200 ? 'fast request rate' : 'normal rate',
+          stdDev < 30 ? 'very consistent timing (bot-like)' : 'variable timing',
+        ],
+        ml_agreement: 'agrees',
+        assessment: {  // Add for pipeline cache compatibility
+          threat_score: threatScore,
+          recommended_action: recommendedAction,
+          classification,
+          confidence: Math.round(maxProb * 100),
+        },
+      };
+
+      return { success: true, assessment };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
   }
 
   getStatus() {

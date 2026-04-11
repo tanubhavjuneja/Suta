@@ -47,7 +47,7 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 
 wss.on('connection', (ws) => {
   console.log('[Dashboard] Client connected');
-  workerManager.getEvents({ count: 50 }).then(result => {
+  workerManager.getEvents({ count: 500 }).then(result => {
     if (result.success) {
       ws.send(JSON.stringify({ type: 'history', events: result.events }));
     }
@@ -58,7 +58,8 @@ wss.on('connection', (ws) => {
 // Listen for events from workers
 workerManager.on('admin_log', (event) => {
   console.log('[Admin]', JSON.stringify(event));
-  const msg = JSON.stringify({ type: 'event', event: { type: 'admin_log', ...event } });
+  // Use the event's own type, not override
+  const msg = JSON.stringify({ type: 'event', event });
   for (const client of wss.clients) {
     if (client.readyState === 1) client.send(msg);
   }
@@ -94,35 +95,43 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/dashboard', express.static(join(__dirname, 'dashboard')));
 
 // ABUSE DETECTION PIPELINE - only active when started
+// Requests pass through immediately, ML classification runs async in background
 app.all('/api/*', async (req, res, next) => {
-  if (pipelineActive) {
-    try {
-      const parsed = parseRequest(req);
-      const result = await workerManager.processRequest({
-        ip: parsed.ip,
-        actorId: req.actorId || generateFingerprint(req),
-        method: parsed.method,
-        path: parsed.path,
-      });
-
-      if (result.action === 'block') {
-        res.status(403).json({
-          error: 'BLOCKED',
-          reason: result.reason,
-          blockedAt: result.blockedEntry?.blockedAt,
-        });
-        return;
-      }
-
-      // Store actorId for routes
-      req.actorId = result.actorId || generateFingerprint(req);
-      next();
-    } catch (e) {
-      console.error('[Pipeline] Error:', e.message);
-      next(); // Fail open
-    }
-  } else {
+  if (!pipelineActive) {
     next();
+    return;
+  }
+
+  try {
+    const parsed = parseRequest(req);
+    const actorId = req.actorId || generateFingerprint(req);
+    console.log(`[Server] Request: ${parsed.method} ${parsed.path} from ${parsed.ip} actor:${actorId}`);
+    
+    // Immediately process request (blocking or non-blocking)
+    const result = await workerManager.processRequest({
+      ip: parsed.ip,
+      actorId: actorId,
+      method: parsed.method,
+      path: parsed.path,
+    });
+
+    console.log(`[Server] Pipeline result: action=${result.action} reason=${result.reason}`);
+
+    // Block if action is block
+    if (result.action === 'block') {
+      res.status(403).json({
+        error: 'BLOCKED',
+        reason: result.reason,
+      });
+      return;
+    }
+
+    // Store actorId for routes
+    req.actorId = actorId;
+    next();
+  } catch (e) {
+    console.error('[Server] Pipeline error:', e.message);
+    next(); // Fail open
   }
 });
 
@@ -582,9 +591,16 @@ async function start() {
     
     // Auto-start pipeline for immediate responsiveness
     try {
-      await workerManager.startPipeline();
-      pipelineActive = true;
-      console.log('[Engine] Pipeline auto-started for immediate protection');
+      console.log('[Engine] Auto-starting pipeline...');
+      
+      // Check workers are available
+      const status = await workerManager.getPipelineStatus();
+      console.log('[Engine] Pipeline status:', status);
+      
+      const result = await workerManager.startPipeline();
+      console.log('[Engine] Pipeline start result:', result);
+      pipelineActive = result.active !== false;
+      console.log('[Engine] Pipeline auto-started for immediate protection, active:', pipelineActive);
     } catch (e) {
       console.log('[Engine] Pipeline start deferred:', e.message);
     }

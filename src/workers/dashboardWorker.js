@@ -102,6 +102,10 @@ class DashboardWorker {
             result = this.addEvent(payload);
             break;
 
+          case 'PIPELINE_TO_DASHBOARD':
+            result = this.addEvent(payload);
+            break;
+
           case 'DASHBOARD_GET_EVENTS':
             result = this.getEvents(payload);
             break;
@@ -334,6 +338,7 @@ class DashboardWorker {
   }
 
   addEvent(event) {
+    console.log('[DashboardWorker] addEvent:', JSON.stringify(event).substring(0, 100));
     this.events.push({
       ...event,
       timestamp: event.timestamp || new Date().toISOString(),
@@ -343,7 +348,13 @@ class DashboardWorker {
       this.events.shift();
     }
 
-    // Forward to logging
+    // Forward to server for websocket (via workerManager event)
+    parentPort.postMessage({
+      type: 'ADMIN_LOG',
+      payload: event
+    });
+
+    // Also log to logging worker
     parentPort.postMessage({
       type: 'LOG_WRITE',
       payload: { level: 'info', message: `EVENT: ${event.type} - ${JSON.stringify(event)}` }

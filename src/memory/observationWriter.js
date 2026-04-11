@@ -105,6 +105,9 @@ export function composeSessionReport(analysis, mlResult = null) {
   if (analysis.ipCount > 1) {
     lines.push(`- Multiple IPs detected — possible IP rotation or distributed infrastructure.`);
   }
+  if (analysis.isUpdate) {
+    lines.push(`- UPDATED: New IP addresses added to existing actor profile.`);
+  }
   lines.push(``);
 
   // Endpoint analysis

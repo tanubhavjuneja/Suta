@@ -181,7 +181,7 @@ export async function abuseDetectionPipeline(req, res, next) {
           // Retain session for future recall (only if not already retained for this actor)
           if (!retainedActors.has(actorId)) {
             retainedActors.add(actorId);
-            memoryLayer.retainSession(analysis, sessionMlResult).then(() => {
+            memoryLayer.retainSession(analysis, sessionMlResult, recallResult).then(() => {
               eventLog.retained(actorId, analysis.sessionId, analysis.requestCount);
             }).catch((e) => eventLog.error('Retain failed', e.message));
           }
