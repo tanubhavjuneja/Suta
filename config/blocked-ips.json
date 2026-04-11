@@ -1,1 +1,614 @@
-{}
+{
+  "122.207.74.74": {
+    "ip": "122.207.74.74",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(8ips→+19)",
+    "score": 80,
+    "blockedAt": "2026-04-11T09:10:08.994Z",
+    "expiresAt": "2026-04-11T09:25:08.994Z",
+    "manualBlock": false,
+    "rulePattern": "122.207.74.74",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 80,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 9,
+        "authEndpointCount": 0,
+        "uniqueIPs": 8,
+        "hasAuth": false,
+        "requestsPerSecond": 0.59,
+        "sequentialIdCount": 9,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 9,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/5",
+      "GET /api/products/6",
+      "GET /api/users/7",
+      "GET /api/products/8",
+      "GET /api/users/9"
+    ]
+  },
+  "158.108.1.206": {
+    "ip": "158.108.1.206",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.24→+12), ip_rotation(9ips→+22)",
+    "score": 83,
+    "blockedAt": "2026-04-11T09:10:10.842Z",
+    "expiresAt": "2026-04-11T09:25:10.842Z",
+    "manualBlock": false,
+    "rulePattern": "158.108.1.206",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 83,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 10,
+        "authEndpointCount": 0,
+        "uniqueIPs": 9,
+        "hasAuth": false,
+        "requestsPerSecond": 0.59,
+        "sequentialIdCount": 10,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 10,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/products/6",
+      "GET /api/users/7",
+      "GET /api/products/8",
+      "GET /api/users/9",
+      "GET /api/products/10"
+    ]
+  },
+  "63.2.199.187": {
+    "ip": "63.2.199.187",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-lczwbd",
+    "reason": "bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+    "score": 81,
+    "blockedAt": "2026-04-11T09:10:11.367Z",
+    "expiresAt": "2026-04-11T09:25:11.367Z",
+    "manualBlock": false,
+    "rulePattern": "63.2.199.187",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 81,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Sequential resource ID enumeration",
+        "Excessive focus on single endpoint"
+      ],
+      "features": {
+        "requestCount": 15,
+        "authEndpointCount": 0,
+        "uniqueIPs": 5,
+        "hasAuth": false,
+        "requestsPerSecond": 0.85,
+        "sequentialIdCount": 15,
+        "endpointPatternCount": 1
+      },
+      "history": {
+        "attempts": 15,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/11/profile",
+      "GET /api/users/12/profile",
+      "GET /api/users/13/profile",
+      "GET /api/users/14/profile",
+      "GET /api/users/15/profile"
+    ]
+  },
+  "21.215.163.97": {
+    "ip": "21.215.163.97",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.27→+12), ip_rotation(9ips→+22)",
+    "score": 83,
+    "blockedAt": "2026-04-11T09:10:11.943Z",
+    "expiresAt": "2026-04-11T09:25:11.944Z",
+    "manualBlock": false,
+    "rulePattern": "21.215.163.97",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 83,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 11,
+        "authEndpointCount": 0,
+        "uniqueIPs": 9,
+        "hasAuth": false,
+        "requestsPerSecond": 0.61,
+        "sequentialIdCount": 11,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 11,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/7",
+      "GET /api/products/8",
+      "GET /api/users/9",
+      "GET /api/products/10",
+      "GET /api/users/11"
+    ]
+  },
+  "20.69.105.116": {
+    "ip": "20.69.105.116",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-lczwbd",
+    "reason": "bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+    "score": 81,
+    "blockedAt": "2026-04-11T09:10:12.301Z",
+    "expiresAt": "2026-04-11T09:25:12.301Z",
+    "manualBlock": false,
+    "rulePattern": "20.69.105.116",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 81,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Sequential resource ID enumeration",
+        "Excessive focus on single endpoint"
+      ],
+      "features": {
+        "requestCount": 16,
+        "authEndpointCount": 0,
+        "uniqueIPs": 5,
+        "hasAuth": false,
+        "requestsPerSecond": 0.86,
+        "sequentialIdCount": 16,
+        "endpointPatternCount": 1
+      },
+      "history": {
+        "attempts": 16,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/12/profile",
+      "GET /api/users/13/profile",
+      "GET /api/users/14/profile",
+      "GET /api/users/15/profile",
+      "GET /api/users/16/profile"
+    ]
+  },
+  "43.63.247.125": {
+    "ip": "43.63.247.125",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-lczwbd",
+    "reason": "bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+    "score": 82,
+    "blockedAt": "2026-04-11T09:10:13.045Z",
+    "expiresAt": "2026-04-11T09:25:13.045Z",
+    "manualBlock": false,
+    "rulePattern": "43.63.247.125",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 82,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Sequential resource ID enumeration",
+        "Excessive focus on single endpoint"
+      ],
+      "features": {
+        "requestCount": 17,
+        "authEndpointCount": 0,
+        "uniqueIPs": 5,
+        "hasAuth": false,
+        "requestsPerSecond": 0.88,
+        "sequentialIdCount": 17,
+        "endpointPatternCount": 1
+      },
+      "history": {
+        "attempts": 17,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/13/profile",
+      "GET /api/users/14/profile",
+      "GET /api/users/15/profile",
+      "GET /api/users/16/profile",
+      "GET /api/users/17/profile"
+    ]
+  },
+  "111.253.9.205": {
+    "ip": "111.253.9.205",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.27→+12), ip_rotation(10ips→+24)",
+    "score": 85,
+    "blockedAt": "2026-04-11T09:10:13.469Z",
+    "expiresAt": "2026-04-11T09:25:13.469Z",
+    "manualBlock": false,
+    "rulePattern": "111.253.9.205",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 85,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 12,
+        "authEndpointCount": 0,
+        "uniqueIPs": 10,
+        "hasAuth": false,
+        "requestsPerSecond": 0.61,
+        "sequentialIdCount": 12,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 12,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/products/8",
+      "GET /api/users/9",
+      "GET /api/products/10",
+      "GET /api/users/11",
+      "GET /api/products/12"
+    ]
+  },
+  "245.159.53.87": {
+    "ip": "245.159.53.87",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-lczwbd",
+    "reason": "bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+    "score": 83,
+    "blockedAt": "2026-04-11T09:10:14.003Z",
+    "expiresAt": "2026-04-11T09:25:14.003Z",
+    "manualBlock": false,
+    "rulePattern": "245.159.53.87",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 83,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Sequential resource ID enumeration",
+        "Excessive focus on single endpoint"
+      ],
+      "features": {
+        "requestCount": 18,
+        "authEndpointCount": 0,
+        "uniqueIPs": 5,
+        "hasAuth": false,
+        "requestsPerSecond": 0.89,
+        "sequentialIdCount": 18,
+        "endpointPatternCount": 1
+      },
+      "history": {
+        "attempts": 18,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/14/profile",
+      "GET /api/users/15/profile",
+      "GET /api/users/16/profile",
+      "GET /api/users/17/profile",
+      "GET /api/users/18/profile"
+    ]
+  },
+  "197.18.153.190": {
+    "ip": "197.18.153.190",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-lczwbd",
+    "reason": "bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+    "score": 84,
+    "blockedAt": "2026-04-11T09:10:14.869Z",
+    "expiresAt": "2026-04-11T09:25:14.869Z",
+    "manualBlock": false,
+    "rulePattern": "197.18.153.190",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 84,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Sequential resource ID enumeration",
+        "Excessive focus on single endpoint"
+      ],
+      "features": {
+        "requestCount": 19,
+        "authEndpointCount": 0,
+        "uniqueIPs": 5,
+        "hasAuth": false,
+        "requestsPerSecond": 0.9,
+        "sequentialIdCount": 19,
+        "endpointPatternCount": 1
+      },
+      "history": {
+        "attempts": 19,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/15/profile",
+      "GET /api/users/16/profile",
+      "GET /api/users/17/profile",
+      "GET /api/users/18/profile",
+      "GET /api/users/19/profile"
+    ]
+  },
+  "80.22.118.225": {
+    "ip": "80.22.118.225",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(10ips→+24)",
+    "score": 85,
+    "blockedAt": "2026-04-11T09:10:15.377Z",
+    "expiresAt": "2026-04-11T09:25:15.377Z",
+    "manualBlock": false,
+    "rulePattern": "80.22.118.225",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 85,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 13,
+        "authEndpointCount": 0,
+        "uniqueIPs": 10,
+        "hasAuth": false,
+        "requestsPerSecond": 0.6,
+        "sequentialIdCount": 13,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 13,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/9",
+      "GET /api/products/10",
+      "GET /api/users/11",
+      "GET /api/products/12",
+      "GET /api/users/13"
+    ]
+  },
+  "42.123.15.72": {
+    "ip": "42.123.15.72",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(11ips→+24)",
+    "score": 85,
+    "blockedAt": "2026-04-11T09:10:16.927Z",
+    "expiresAt": "2026-04-11T09:25:16.927Z",
+    "manualBlock": false,
+    "rulePattern": "42.123.15.72",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 85,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 14,
+        "authEndpointCount": 0,
+        "uniqueIPs": 11,
+        "hasAuth": false,
+        "requestsPerSecond": 0.61,
+        "sequentialIdCount": 14,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 14,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/products/10",
+      "GET /api/users/11",
+      "GET /api/products/12",
+      "GET /api/users/13",
+      "GET /api/products/14"
+    ]
+  },
+  "40.41.179.76": {
+    "ip": "40.41.179.76",
+    "ipRange": false,
+    "rangeStart": null,
+    "rangeEnd": null,
+    "rangeSize": 1,
+    "actorId": "actor-gs2b00",
+    "reason": "bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.26→+12), high_volume(15reqs→+14), ip_rotation(12ips→+24)",
+    "score": 99,
+    "blockedAt": "2026-04-11T09:10:18.075Z",
+    "expiresAt": "2026-04-11T09:25:18.075Z",
+    "manualBlock": false,
+    "rulePattern": "40.41.179.76",
+    "attackType": "SCRAPING",
+    "reasonDetail": {
+      "attackType": "SCRAPING",
+      "confidence": 0.9,
+      "ruleMatched": "SCRAPING_SEQUENTIAL_100",
+      "mlScore": 99,
+      "reasons": [
+        "Automated data harvesting pattern detected",
+        "Sequential ID enumeration pattern",
+        "Non-browser User-Agent detected",
+        "Missing standard browser headers",
+        "Sequential resource ID enumeration"
+      ],
+      "features": {
+        "requestCount": 15,
+        "authEndpointCount": 0,
+        "uniqueIPs": 12,
+        "hasAuth": false,
+        "requestsPerSecond": 0.62,
+        "sequentialIdCount": 15,
+        "endpointPatternCount": 2
+      },
+      "history": {
+        "attempts": 15,
+        "firstSeen": "2026-04-11T09:09:53.790Z",
+        "predictedBeforeBlock": true,
+        "suspicionStage": "BLOCKED",
+        "stageTransitions": 4
+      }
+    },
+    "evidence": [
+      "GET /api/users/11",
+      "GET /api/products/12",
+      "GET /api/users/13",
+      "GET /api/products/14",
+      "GET /api/users/15"
+    ]
+  }
+}

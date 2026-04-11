@@ -1,16 +1,62 @@
 // src/workers/pipelineWorker.js
 // Pipeline Worker - handles request filtering, IP blocking, rule updates
 // ═══════════════════════════════════════════════════════════════
+// BEHAVIORAL SCORING: Deterministic, inline scoring layer that
+// catches attacks in real-time using weighted behavioral signals.
+// ML assessment runs async in background for refinement.
+//
+// INTELLIGENCE LAYER: Attack classification, reason building,
+// evidence tracking, and explainability.
+// ═══════════════════════════════════════════════════════════════
 import { parentPort } from 'worker_threads';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { classifyAttack, getAttackSeverity } from '../intelligence/attackClassifier.js';
+import { buildReason } from '../intelligence/reasonBuilder.js';
+import attackTracker from '../intelligence/attackTracker.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CONFIG_DIR = path.join(__dirname, '../../config');
 const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MINUTES || '5', 10) * 60 * 1000;
-const SESSION_BUFFER_THRESHOLD = parseInt(process.env.SESSION_BUFFER_THRESHOLD || '3', 10);
+const SESSION_BUFFER_THRESHOLD = parseInt(process.env.SESSION_BUFFER_THRESHOLD || '5', 10);
+
+// ── Bot User-Agent patterns ─────────────────────────────────
+const BOT_UA_PATTERNS = [
+  'python-requests', 'python-urllib', 'python-httpx',
+  'curl/', 'wget/', 'httpie/',
+  'go-http-client', 'java/', 'okhttp/',
+  'scrapy', 'selenium', 'puppeteer', 'playwright',
+  'headlesschrome', 'phantomjs',
+  'bot', 'crawler', 'spider', 'scraper',
+  'apache-httpclient', 'libwww-perl',
+];
+
+// ── Browser-standard headers (missing = suspicious) ─────────
+const BROWSER_HEADERS = [
+  'accept-language', 'sec-ch-ua', 'sec-ch-ua-mobile',
+  'sec-ch-ua-platform', 'sec-fetch-dest', 'sec-fetch-mode',
+  'sec-fetch-site', 'upgrade-insecure-requests', 'cache-control',
+];
+
+// ── Behavioral scoring weights ──────────────────────────────
+const SCORE_WEIGHTS = {
+  AUTH_ENDPOINT_REPETITION: 30,    // ≥5 POST /auth/login → credential stuffing
+  BOT_USER_AGENT: 15,             // Non-browser User-Agent
+  MISSING_BROWSER_HEADERS: 12,    // Missing standard browser headers
+  SEQUENTIAL_ID_ACCESS: 22,       // Accessing /users/1, /users/2, /users/3...
+  SINGLE_ENDPOINT_FOCUS: 18,      // >80% requests to same endpoint pattern
+  LOW_TIMING_VARIANCE: 12,        // Machine-like consistency
+  HIGH_REQUEST_VOLUME: 18,        // >15 requests in session
+  IP_ROTATION: 12,                // Multiple IPs for same actor fingerprint
+  HAS_VALID_AUTH: -20,            // Legitimate users usually have auth tokens
+  DIVERSE_ENDPOINTS: -15,         // Natural browsing hits many different pages
+};
+
+// ── Enforcement thresholds ──────────────────────────────────
+const BLOCK_THRESHOLD = 80;
+const THROTTLE_THRESHOLD = 55;
 
 class PipelineWorker {
   constructor() {
@@ -22,13 +68,16 @@ class PipelineWorker {
     this.pendingAssessments = new Map();
     this.requestTimestamps = new Map();  // Track by actorId
     this.ipRequestTimestamps = new Map(); // Track by IP for distributed attack detection
+
+    // ── NEW: Actor behavioral profiles ──────────────────────
+    this.actorProfiles = new Map(); // actorId → ActorProfile
     this.init();
   }
 
   init() {
     this.loadBlockedIPs();
     this.setupHandlers();
-    console.log('[PipelineWorker] Initialized');
+    console.log('[PipelineWorker] Initialized with behavioral scoring');
   }
 
   loadBlockedIPs() {
@@ -106,12 +155,6 @@ class PipelineWorker {
               pending.reject(new Error(result.error || 'Assessment failed'));
             }
             break;
-            // Handle ML assessment response
-            if (id && this.pendingAssessments?.has(id)) {
-              this.handleMLAssessment({ id, result });
-              result = null;
-            }
-            break;
 
           default:
             result = { success: false, error: `Unknown type: ${type}` };
@@ -131,7 +174,7 @@ class PipelineWorker {
 
   startPipeline() {
     this.active = true;
-    this.log('Pipeline started');
+    this.log('Pipeline started with behavioral scoring');
     return { success: true, active: true };
   }
 
@@ -146,109 +189,117 @@ class PipelineWorker {
       active: this.active,
       blockedIPCount: this.blockedIPs.size,
       activeSessions: this.sessionBuffer.size,
+      trackedActors: this.actorProfiles.size,
     };
   }
 
+  // ═══════════════════════════════════════════════════════════
+  //  CORE: Process incoming request with behavioral scoring
+  // ═══════════════════════════════════════════════════════════
   async processRequest(reqData) {
     if (!this.active) {
       return { action: 'allow', reason: 'pipeline_inactive' };
     }
 
-    const { ip, actorId, method, path: endpoint } = reqData;
+    const { ip, actorId, method, path: endpoint, headers, userAgent, hasAuth } = reqData;
 
-    // Check if IP is blocked
+    // ── Step 1: Check if IP is blocked ──────────────────────
     if (this.isIPBlocked(ip)) {
-      const entry = this.blockedIPs.get(ip);
-      // Throttle instead of block for existing blocklist entries (avoid false positives)
-      return {
-        action: 'throttle',
-        reason: 'ip_blocked',
-        blockedEntry: entry,
-      };
+      this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: 'ip_blocked', score: 95, timestamp: new Date().toISOString() });
+      return { action: 'block', reason: 'ip_blocked', score: 95 };
     }
 
-    // Rate-based blocking - count requests per actor in sliding window
-    // Check assessment cache FIRST (before any rate counting)
-    if (actorId) {
-      const cached = this.assessmentCache.get(actorId);
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-        const score = cached.assessment.threat_score;
-        const recommended = cached.assessment.recommended_action;
-        const attackType = cached.assessment.classification || cached.assessment.attack_type;
-        
-        // BLOCK high-confidence attacks (SQL_INJECTION, XSS, PATH_TRAVERSAL)
-        // These have signature-based detection with no false positives
-        const highConfidenceAttacks = ['sql_injection', 'xss', 'path_traversal'];
-        if (attackType && highConfidenceAttacks.includes(attackType)) {
-          this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: `ml_${attackType}`, score, attackType, timestamp: new Date().toISOString() });
-          return { action: 'block', reason: `ml_${attackType}`, score, attackType };
-        }
-        
-        // Throttle on high ML score for other attack types (avoid false positives)
-        if (recommended === 'block' || score >= 85) {
-          this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'ml_blocked', score, timestamp: new Date().toISOString() });
-          return { action: 'throttle', reason: 'ml_blocked', score };
-        }
-        if (recommended === 'throttle' || score >= 70) {
-          this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'ml_throttled', score, timestamp: new Date().toISOString() });
-          return { action: 'throttle', reason: 'ml_throttled', score };
-        }
-      }
+    // ── Step 2: Update actor behavioral profile ─────────────
+    const profile = this.getOrCreateProfile(actorId);
+    this.updateProfile(profile, { ip, method, endpoint, headers, userAgent, hasAuth });
+
+    // ── Step 3: Compute behavioral score ────────────────────
+    const { score, signals } = this.computeBehavioralScore(profile);
+
+    // ── Step 3b: Attack Intelligence Layer ──────────────────
+    const classification = classifyAttack(
+      { method, endpoint, ip, body: reqData.body, queryParams: reqData.queryParams, headers },
+      profile, score
+    );
+    const trackerEntry = attackTracker.update(
+      actorId, score,
+      score >= BLOCK_THRESHOLD ? 'block' : score >= THROTTLE_THRESHOLD ? 'throttle' : 'allow',
+      { method, endpoint, body: reqData.body }
+    );
+
+    // ── Step 4: Enforce based on score ──────────────────────
+    if (score >= BLOCK_THRESHOLD) {
+      const reason = buildReason({
+        attackType: classification.attackType,
+        confidence: classification.confidence,
+        ruleMatched: classification.ruleMatched,
+        score, signals, profile, tracker: trackerEntry,
+      });
+      const evidence = attackTracker.getEvidenceSummary(actorId);
+
+      this.sendEvent({
+        type: 'enforcement', action: 'block', ip, actorId,
+        reason: `behavioral_block`, score,
+        signals: signals.join(', '),
+        attackType: classification.attackType,
+        confidence: classification.confidence,
+        ruleMatched: classification.ruleMatched,
+        reasonDetail: reason,
+        evidence,
+        timestamp: new Date().toISOString()
+      });
+
+      // Also block the IP to catch future requests immediately
+      this.blockIP({ ip, actorId, reason: signals.join(', '), score,
+        attackType: classification.attackType,
+        reasonDetail: reason,
+        evidence,
+      });
+
+      return { action: 'block', reason: `behavioral_block: ${signals.join(', ')}`, score };
     }
 
-    // Rate limiting - only count after passing checks
+    if (score >= THROTTLE_THRESHOLD) {
+      const reason = buildReason({
+        attackType: classification.attackType,
+        confidence: classification.confidence,
+        ruleMatched: classification.ruleMatched,
+        score, signals, profile, tracker: trackerEntry,
+      });
+
+      this.sendEvent({
+        type: 'enforcement', action: 'throttle', ip, actorId,
+        reason: `behavioral_throttle`, score,
+        signals: signals.join(', '),
+        attackType: classification.attackType,
+        confidence: classification.confidence,
+        ruleMatched: classification.ruleMatched,
+        reasonDetail: reason,
+        timestamp: new Date().toISOString()
+      });
+      return { action: 'throttle', reason: `behavioral_throttle: ${signals.join(', ')}`, score };
+    }
+
+    // ── Step 5: Rate limiting (for very fast bursts) ────────
     const now = Date.now();
-    if (!this.requestTimestamps) this.requestTimestamps = new Map();
-    
     if (!this.requestTimestamps.has(actorId)) {
       this.requestTimestamps.set(actorId, []);
     }
     const timestamps = this.requestTimestamps.get(actorId);
     timestamps.push(now);
-    
-    // Keep only last 3 seconds of timestamps (very sensitive)
+
+    // Keep only last 3 seconds of timestamps
     while (timestamps.length > 0 && timestamps[0] < now - 3000) {
       timestamps.shift();
     }
-    this.requestTimestamps.set(actorId, timestamps);
-    
-    // Higher thresholds to reduce false positives on normal users
-    // Throttle at very high rates (12+ req in 3 seconds = 4 req/s)
+
+    // Burst detection: 12+ req in 3 seconds = 4 req/s
     if (timestamps.length > 12) {
-      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_exceeded', score: 75, timestamp: new Date().toISOString() });
-      return { action: 'throttle', reason: 'rate_exceeded', score: 75 };
-    }
-    // Throttle at moderately high rates (7+ req in 3 seconds = 2.3 req/s)
-    if (timestamps.length > 7) {
-      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_high', score: 50, timestamp: new Date().toISOString() });
-      return { action: 'throttle', reason: 'rate_high', score: 50 };
+      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'rate_burst', score: 75, timestamp: new Date().toISOString() });
+      return { action: 'throttle', reason: 'rate_burst', score: 75 };
     }
 
-    // Distributed attack detection - track all IPs in last 3 seconds
-    if (!this.ipRequestTimestamps) this.ipRequestTimestamps = new Map();
-    const threeSecAgo = now - 3000;
-    
-    const activeIPs = new Set();
-    for (const [trackedIP, tsList] of this.ipRequestTimestamps) {
-      const recent = tsList.filter(t => t > threeSecAgo);
-      if (recent.length > 0) {
-        this.ipRequestTimestamps.set(trackedIP, recent);
-        activeIPs.add(trackedIP);
-      } else {
-        this.ipRequestTimestamps.delete(trackedIP);
-      }
-    }
-    
-    activeIPs.add(ip);
-    this.ipRequestTimestamps.set(ip, [...(this.ipRequestTimestamps.get(ip) || []), now]);
-    
-    // Throttle at very high IP count (15+ unique IPs in 3 seconds)
-    if (activeIPs.size > 15) {
-      this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'distributed_scan', score: 50, timestamp: new Date().toISOString() });
-      return { action: 'throttle', reason: 'distributed_scan', score: 50 };
-    }
-
-// Buffer request for session analysis
+    // ── Step 6: Buffer for async ML assessment ──────────────
     if (!this.sessionBuffer.has(actorId)) {
       this.sessionBuffer.set(actorId, {
         requests: [],
@@ -257,51 +308,290 @@ class PipelineWorker {
     }
 
     const buffered = this.sessionBuffer.get(actorId);
-    buffered.requests.push({
-      method,
-      endpoint,
-      ip,
-      time: Date.now(),
-    });
+    buffered.requests.push({ method, endpoint, ip, time: Date.now() });
 
-    // Check if buffer threshold reached - trigger async session analysis
+    // Trigger async ML assessment when buffer fills
     if (buffered.requests.length >= SESSION_BUFFER_THRESHOLD) {
-      // Trigger ML assessment in background
       this.assessWithML(actorId, buffered.requests, ip).then(result => {
         if (result.success && result.assessment) {
           const assessment = result.assessment;
-          
-          // Cache result for future requests
           this.assessmentCache.set(actorId, {
             timestamp: Date.now(),
             assessment: assessment.assessment || assessment,
           });
-
-          // Send result to dashboard
           this.sendEvent({
-            type: 'classification',
-            ip,
-            actorId,
+            type: 'classification', ip, actorId,
             score: assessment.threat_score,
             classification: assessment.classification,
             confidence: assessment.confidence,
             recommended_action: assessment.recommended_action,
-            attack_type: assessment.attack_type,
             timestamp: new Date().toISOString(),
           });
         }
-      }).catch(e => {});
-
-      // Clear buffer after triggering
+      }).catch(() => {});
       this.sessionBuffer.delete(actorId);
     }
 
-    // Send allow event to dashboard (use request type for counter)
+    // ── Step 7: Allow the request ───────────────────────────
     this.sendEvent({ type: 'request', ip, actorId, method, endpoint, timestamp: new Date().toISOString() });
-    return { action: 'allow', reason: 'request_allowed' };
+    return { action: 'allow', reason: 'request_allowed', score };
   }
 
-  blockIP({ ip, actorId, reason, score = 50, manualBlock = false }) {
+  // ═══════════════════════════════════════════════════════════
+  //  ACTOR PROFILING: Tracks behavioral signals per actor
+  // ═══════════════════════════════════════════════════════════
+
+  getOrCreateProfile(actorId) {
+    if (!this.actorProfiles.has(actorId)) {
+      this.actorProfiles.set(actorId, {
+        actorId,
+        firstSeen: Date.now(),
+        requestCount: 0,
+        endpoints: [],           // raw endpoint list
+        endpointPatterns: [],     // normalized patterns (IDs replaced)
+        methods: [],
+        ips: new Set(),
+        timestamps: [],
+        userAgents: new Set(),
+        hasAuth: false,
+        authCount: 0,
+        noAuthCount: 0,
+        authEndpointCount: 0,    // hits to /auth/login etc
+        sequentialIds: [],       // numeric IDs extracted from paths
+        headerCounts: [],        // track header richness
+        lastScore: 0,
+      });
+    }
+    return this.actorProfiles.get(actorId);
+  }
+
+  updateProfile(profile, reqData) {
+    const { ip, method, endpoint, headers, userAgent, hasAuth } = reqData;
+    const now = Date.now();
+
+    profile.requestCount++;
+    profile.timestamps.push(now);
+    profile.endpoints.push(endpoint);
+    profile.methods.push(method);
+
+    // Track IPs
+    if (ip) profile.ips.add(ip);
+
+    // Track User-Agent
+    if (userAgent) profile.userAgents.add(userAgent);
+
+    // Track auth presence
+    if (hasAuth) {
+      profile.hasAuth = true;
+      profile.authCount++;
+    } else {
+      profile.noAuthCount++;
+    }
+
+    // Track auth endpoint hits (login, reset, verify)
+    const epLower = (endpoint || '').toLowerCase();
+    if ((epLower.includes('/auth/') || epLower.includes('/login')) && method === 'POST') {
+      profile.authEndpointCount++;
+    }
+
+    // Extract numeric IDs from paths for sequential detection
+    const idMatch = endpoint?.match(/\/(\d+)(?:\/|$|\?)/);
+    if (idMatch) {
+      profile.sequentialIds.push(parseInt(idMatch[1], 10));
+    }
+
+    // Normalize endpoint pattern (replace numeric IDs with :id)
+    const pattern = (endpoint || '').replace(/\/\d+/g, '/:id').replace(/\?.*$/, '');
+    profile.endpointPatterns.push(pattern);
+
+    // Track header count from this request
+    if (headers) {
+      const headerCount = typeof headers === 'object' ? Object.keys(headers).length : 0;
+      profile.headerCounts.push(headerCount);
+    }
+
+    // Trim old data to prevent memory growth (keep last 100 entries)
+    if (profile.timestamps.length > 100) {
+      profile.timestamps = profile.timestamps.slice(-100);
+      profile.endpoints = profile.endpoints.slice(-100);
+      profile.endpointPatterns = profile.endpointPatterns.slice(-100);
+      profile.methods = profile.methods.slice(-100);
+      profile.sequentialIds = profile.sequentialIds.slice(-100);
+      profile.headerCounts = profile.headerCounts.slice(-100);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  BEHAVIORAL SCORING: Deterministic, weighted scoring
+  // ═══════════════════════════════════════════════════════════
+
+  computeBehavioralScore(profile) {
+    let score = 0;
+    const signals = [];
+
+    // Need at least 3 requests to make meaningful assessments
+    if (profile.requestCount < 3) {
+      return { score: 0, signals: ['insufficient_data'] };
+    }
+
+    // ── Signal 1: Auth endpoint repetition ──────────────────
+    // Repeated POST /auth/login = credential stuffing / brute force
+    if (profile.authEndpointCount >= 3) {
+      const authWeight = Math.min(profile.authEndpointCount / 3, 2.5); // scale up faster
+      const points = Math.round(SCORE_WEIGHTS.AUTH_ENDPOINT_REPETITION * authWeight);
+      score += points;
+      signals.push(`auth_repetition(${profile.authEndpointCount}x→+${points})`);
+    }
+
+    // ── Signal 2: Bot User-Agent ────────────────────────────
+    const isBotUA = this.isBotUserAgent(profile);
+    if (isBotUA) {
+      score += SCORE_WEIGHTS.BOT_USER_AGENT;
+      signals.push(`bot_ua(+${SCORE_WEIGHTS.BOT_USER_AGENT})`);
+    }
+
+    // ── Signal 3: Missing browser headers ───────────────────
+    // If average header count is very low, likely automation tool
+    if (profile.headerCounts.length > 0) {
+      const avgHeaders = profile.headerCounts.reduce((a, b) => a + b, 0) / profile.headerCounts.length;
+      if (avgHeaders < 8) {
+        score += SCORE_WEIGHTS.MISSING_BROWSER_HEADERS;
+        signals.push(`sparse_headers(avg=${avgHeaders.toFixed(1)}→+${SCORE_WEIGHTS.MISSING_BROWSER_HEADERS})`);
+      }
+    }
+
+    // ── Signal 4: Sequential ID access ──────────────────────
+    // Accessing /users/1, /users/2, /users/3... is enumeration
+    if (profile.sequentialIds.length >= 4) {
+      const seqScore = this.computeSequentialScore(profile.sequentialIds);
+      if (seqScore > 0.4) {
+        const points = Math.round(SCORE_WEIGHTS.SEQUENTIAL_ID_ACCESS * seqScore);
+        score += points;
+        signals.push(`sequential_ids(${(seqScore * 100).toFixed(0)}%→+${points})`);
+      }
+    }
+
+    // ── Signal 5: Single endpoint focus ─────────────────────
+    // >75% of requests going to the same endpoint pattern = scraping
+    if (profile.endpointPatterns.length >= 4) {
+      const patternCounts = {};
+      profile.endpointPatterns.forEach(p => { patternCounts[p] = (patternCounts[p] || 0) + 1; });
+      const maxPatternCount = Math.max(...Object.values(patternCounts));
+      const focusRatio = maxPatternCount / profile.endpointPatterns.length;
+      if (focusRatio > 0.75) {
+        score += SCORE_WEIGHTS.SINGLE_ENDPOINT_FOCUS;
+        signals.push(`endpoint_focus(${(focusRatio * 100).toFixed(0)}%→+${SCORE_WEIGHTS.SINGLE_ENDPOINT_FOCUS})`);
+      }
+    }
+
+    // ── Signal 6: Low timing variance (machine-like) ────────
+    if (profile.timestamps.length >= 5) {
+      const intervals = [];
+      for (let i = 1; i < profile.timestamps.length; i++) {
+        intervals.push(profile.timestamps[i] - profile.timestamps[i - 1]);
+      }
+      const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      if (mean > 0) {
+        const variance = intervals.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / intervals.length;
+        const stddev = Math.sqrt(variance);
+        const cv = stddev / mean; // coefficient of variation
+        // Very consistent timing (CV < 0.3) = likely automated
+        if (cv < 0.3 && mean < 2000) {
+          score += SCORE_WEIGHTS.LOW_TIMING_VARIANCE;
+          signals.push(`low_variance(cv=${cv.toFixed(2)}→+${SCORE_WEIGHTS.LOW_TIMING_VARIANCE})`);
+        }
+      }
+    }
+
+    // ── Signal 7: High request volume ───────────────────────
+    if (profile.requestCount >= 15) {
+      const elapsed = (Date.now() - profile.firstSeen) / 1000; // seconds
+      const rps = profile.requestCount / Math.max(elapsed, 1);
+      // Only flag if sustained high volume (not just normal browsing over a long period)
+      if (rps > 0.3 || profile.requestCount >= 25) {
+        const volumeScale = Math.min(profile.requestCount / 20, 2.0);
+        const points = Math.round(SCORE_WEIGHTS.HIGH_REQUEST_VOLUME * volumeScale);
+        score += points;
+        signals.push(`high_volume(${profile.requestCount}reqs→+${points})`);
+      }
+    }
+
+    // ── Signal 8: IP rotation ───────────────────────────────
+    // Multiple IPs but same actor fingerprint = distributed attack
+    if (profile.ips.size >= 3) {
+      const ipScale = Math.min(profile.ips.size / 5, 2.0);
+      const points = Math.round(SCORE_WEIGHTS.IP_ROTATION * ipScale);
+      score += points;
+      signals.push(`ip_rotation(${profile.ips.size}ips→+${points})`);
+    }
+
+    // ── Signal 9: Has valid auth (BONUS — reduces score) ────
+    if (profile.hasAuth && profile.authCount > profile.noAuthCount) {
+      score += SCORE_WEIGHTS.HAS_VALID_AUTH; // negative weight
+      signals.push(`has_auth(→${SCORE_WEIGHTS.HAS_VALID_AUTH})`);
+    }
+
+    // ── Signal 10: Diverse endpoints (BONUS — reduces score) ─
+    if (profile.endpointPatterns.length >= 3) {
+      const uniquePatterns = new Set(profile.endpointPatterns);
+      const diversity = uniquePatterns.size / profile.endpointPatterns.length;
+      if (diversity > 0.5 && uniquePatterns.size >= 3) {
+        score += SCORE_WEIGHTS.DIVERSE_ENDPOINTS; // negative weight
+        signals.push(`diverse_endpoints(${uniquePatterns.size}unique→${SCORE_WEIGHTS.DIVERSE_ENDPOINTS})`);
+      }
+    }
+
+    // ── Signal 11: Credential stuffing amplifier ─────────────
+    // Hitting auth endpoints repeatedly without ever having auth = stuffing
+    // Real users authenticate once and then use tokens for subsequent requests
+    if (profile.authEndpointCount >= 3 && !profile.hasAuth) {
+      const stuffingRatio = profile.authEndpointCount / profile.requestCount;
+      if (stuffingRatio > 0.6) {
+        const points = 20; // strong signal
+        score += points;
+        signals.push(`cred_stuffing_noauth(${(stuffingRatio * 100).toFixed(0)}%→+${points})`);
+      }
+    }
+
+    // Clamp to [0, 100]
+    score = Math.max(0, Math.min(100, score));
+    profile.lastScore = score;
+
+    return { score, signals };
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  HELPER: Detect bot User-Agent
+  // ═══════════════════════════════════════════════════════════
+  isBotUserAgent(profile) {
+    for (const ua of profile.userAgents) {
+      const lower = (ua || '').toLowerCase();
+      if (BOT_UA_PATTERNS.some(pattern => lower.includes(pattern))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  HELPER: Detect sequential ID access pattern
+  // ═══════════════════════════════════════════════════════════
+  computeSequentialScore(ids) {
+    if (ids.length < 4) return 0;
+
+    let sequential = 0;
+    for (let i = 1; i < ids.length; i++) {
+      if (ids[i] === ids[i - 1] + 1) sequential++;
+    }
+
+    return sequential / (ids.length - 1);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  IP BLOCKING
+  // ═══════════════════════════════════════════════════════════
+
+  blockIP({ ip, actorId, reason, score = 50, manualBlock = false, attackType, reasonDetail, evidence }) {
     const isRange = this.isIPRange(ip);
     const existing = this.blockedIPs.get(ip);
     const isNewBlock = !existing;
@@ -311,6 +601,10 @@ class PipelineWorker {
       existing.score = Math.max(existing.score, score);
       existing.blockedAt = new Date().toISOString();
       existing.expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+      // Update intelligence fields if provided
+      if (attackType) existing.attackType = attackType;
+      if (reasonDetail) existing.reasonDetail = reasonDetail;
+      if (evidence) existing.evidence = evidence;
     } else {
       entry = {
         ip,
@@ -325,6 +619,10 @@ class PipelineWorker {
         expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
         manualBlock,
         rulePattern: ip,
+        // Intelligence fields
+        attackType: attackType || null,
+        reasonDetail: reasonDetail || null,
+        evidence: evidence || [],
       };
       this.blockedIPs.set(ip, entry);
 
@@ -355,11 +653,23 @@ class PipelineWorker {
     this.saveBlockedIPs();
 
     const type = isRange ? 'IP range' : 'IP';
-    this.log(`${type} ${isNewBlock ? 'blocked' : 'updated'}: ${ip} (${entry.rangeSize || 1} addresses, reason: ${reason}, manual: ${manualBlock})`);
+    this.log(`${type} ${isNewBlock ? 'blocked' : 'updated'}: ${ip} (${entry.rangeSize || 1} addresses, reason: ${reason}, manual: ${manualBlock}${attackType ? ', attack: ' + attackType : ''})`);
+
+    // Send enhanced ip_blocked event to dashboard with intelligence data
+    this.sendEvent({
+      type: 'ip_blocked',
+      ip, actorId, score,
+      attackType: attackType || null,
+      confidence: reasonDetail?.confidence || null,
+      ruleMatched: reasonDetail?.ruleMatched || null,
+      reasonDetail: reasonDetail || null,
+      evidence: evidence || [],
+      timestamp: new Date().toISOString(),
+    });
 
     parentPort.postMessage({
       type: 'ML_BLOCK_IP',
-      payload: { ip, actorId, reason, score, isRange }
+      payload: { ip, actorId, reason, score, isRange, attackType }
     });
 
     return { success: true, ip, isRange, rangeSize: isRange ? this.getIPRangeSize(ip) : 1 };
@@ -443,7 +753,6 @@ class PipelineWorker {
     for (const file of files.slice(-3)) {
       try {
         const content = fs.readFileSync(path.join(logsDir, file), 'utf8');
-        // Filter by IP in JSON field OR X-Forwarded-For in the line
         const lines = content.split('\n').filter(l => 
           l.includes(`"ip":"${targetIP}"`) || 
           l.includes(`"ip":"${targetIP.replace(/\./g, '\\.')}"`) ||
@@ -453,7 +762,6 @@ class PipelineWorker {
         for (const line of lines.slice(-200)) {
           let eventData = null;
           
-          // Try to extract JSON from log line
           const jsonMatch = line.match(/\{.+\}$/);
           if (jsonMatch) {
             try {
@@ -462,12 +770,8 @@ class PipelineWorker {
           }
 
           if (eventData) {
-            if (eventData.userAgent) {
-              patterns.userAgents.add(eventData.userAgent);
-            }
-            if (eventData.method) {
-              patterns.methods.add(eventData.method.toUpperCase());
-            }
+            if (eventData.userAgent) patterns.userAgents.add(eventData.userAgent);
+            if (eventData.method) patterns.methods.add(eventData.method.toUpperCase());
             if (eventData.endpoint || eventData.path) {
               const ep = eventData.endpoint || eventData.path;
               patterns.endpoints.add(ep);
@@ -511,7 +815,6 @@ class PipelineWorker {
 
     this.log(`[ManualBlock] Created patterns for ${ip}: ${summary.endpoints.length} endpoints, ${summary.userAgents.length} UAs`);
 
-    // Send to ML worker for fingerprint creation
     parentPort.postMessage({
       type: 'ML_CREATE_FINGERPRINT',
       payload: { ip, patterns: summary }
@@ -551,7 +854,6 @@ class PipelineWorker {
     const actorId = entry.actorId;
     const isRange = entry.ipRange;
     const allIPs = this.getAllIPsInRange(entry);
-    const originalIP = ip;
 
     this.blockedIPs.delete(entry.ip);
     this.saveBlockedIPs();
@@ -665,37 +967,31 @@ class PipelineWorker {
   }
 
   sendEvent(event) {
-    // Events sent via workerManager routing
     parentPort.postMessage({
       type: 'PIPELINE_TO_DASHBOARD',
       payload: event
     });
   }
 
-  // For ML assessment - use request/response through workerManager
-  // The actual assessment happens async, this just triggers it
-  // Results are handled in processRequest via cache
   triggerAssessment(actorId, requests, ip) {
-    // Send to ML worker via workerManager routing
     parentPort.postMessage({
       type: 'ML_ASSESS_SESSION',
       payload: { actorId, requests, ip }
     });
   }
 
-  // Called for cache-based blocking - real assessment happens async
   async assessWithML(actorId, requests, ip) {
     return new Promise((resolve, reject) => {
       const id = ++this.assessmentId || 1;
       
       const timeout = setTimeout(() => {
+        this.pendingAssessments.delete(id);
         reject(new Error('ML assessment timeout'));
       }, 15000);
 
       this.pendingAssessments = this.pendingAssessments || new Map();
       this.pendingAssessments.set(id, { resolve, reject, timeout });
 
-      // Send via workerManager routing
       parentPort.postMessage({
         type: 'ML_ASSESS_SESSION',
         id,
@@ -726,7 +1022,6 @@ class PipelineWorker {
     const ips = [];
 
     for (const [ip, entry] of this.blockedIPs) {
-      // Clean up expired
       if (new Date(entry.expiresAt) < new Date()) {
         this.blockedIPs.delete(ip);
         continue;
