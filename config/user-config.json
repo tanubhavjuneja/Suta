@@ -482,7 +482,7 @@
     "rulesThreshold": 5,
     "forceFullRetrainEvery": 24,
     "trainingStatus": "completed",
-    "lastTrainedAt": "2026-04-11T02:03:48.979Z",
+    "lastTrainedAt": "2026-04-11T03:15:00.130Z",
     "nextScheduledAt": null,
     "rulesChangedSinceLastTrain": 0
   },

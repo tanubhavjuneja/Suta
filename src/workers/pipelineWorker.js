@@ -174,8 +174,17 @@ class PipelineWorker {
       if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
         const score = cached.assessment.threat_score;
         const recommended = cached.assessment.recommended_action;
+        const attackType = cached.assessment.classification || cached.assessment.attack_type;
         
-        // Throttle on high ML score - never block to avoid false positives
+        // BLOCK high-confidence attacks (SQL_INJECTION, XSS, PATH_TRAVERSAL)
+        // These have signature-based detection with no false positives
+        const highConfidenceAttacks = ['sql_injection', 'xss', 'path_traversal'];
+        if (attackType && highConfidenceAttacks.includes(attackType)) {
+          this.sendEvent({ type: 'enforcement', action: 'block', ip, actorId, reason: `ml_${attackType}`, score, attackType, timestamp: new Date().toISOString() });
+          return { action: 'block', reason: `ml_${attackType}`, score, attackType };
+        }
+        
+        // Throttle on high ML score for other attack types (avoid false positives)
         if (recommended === 'block' || score >= 85) {
           this.sendEvent({ type: 'enforcement', action: 'throttle', ip, actorId, reason: 'ml_blocked', score, timestamp: new Date().toISOString() });
           return { action: 'throttle', reason: 'ml_blocked', score };
@@ -277,6 +286,7 @@ class PipelineWorker {
             classification: assessment.classification,
             confidence: assessment.confidence,
             recommended_action: assessment.recommended_action,
+            attack_type: assessment.attack_type,
             timestamp: new Date().toISOString(),
           });
         }
