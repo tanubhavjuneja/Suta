@@ -13,6 +13,7 @@ We built an API abuse detection engine that sits in front of any REST API and au
 3. **Multi-worker architecture** — Separates detection, ML inference, and dashboard into isolated processes for reliability
 
 The core detection happens in a pipeline worker that processes every incoming request. For each request, it checks:
+
 - Is this IP already blocked?
 - Is the request rate suspicious?
 - Does the ML model flag this as malicious?
@@ -128,6 +129,7 @@ After running this in production for weeks, here's what matters:
 ## What's next
 
 We're extending this system in a few directions:
+
 - Training data generation from Hindsight observations to continuously improve our TensorFlow model
 - Automatic rule extraction from successful blocks to feed back into our signature database
 - Multi-region memory so attackers can't bypass by switching data centers
@@ -135,3 +137,11 @@ We're extending this system in a few directions:
 If you're building any detection system—security or otherwise—consider adding [agent memory](https://vectorize.io/what-is-agent-memory). It's not just about storing data. It's about giving your system a way to learn from what it sees, reason over past experiences, and make better decisions over time.
 
 The code is open source if you want to see the full implementation. But the lesson is simple: your detection system shouldn't just catch attacks. It should remember them.
+
+---
+
+**Team: PD Lovers**
+
+**Members: Suhani Munjal, Tanubhav Juneja**
+
+[Hindsight GitHub](https://github.com/vectorize-io/hindsight) | [Hindsight Docs](https://hindsight.vectorize.io/) | [Vectorize Agent Memory](https://vectorize.io/what-is-agent-memory)
