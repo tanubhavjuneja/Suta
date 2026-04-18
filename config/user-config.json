@@ -2883,12 +2883,6 @@
       "weight": 99,
       "createdAt": "2026-04-11T09:10:18.080Z",
       "updatedAt": "2026-04-11T09:10:18.080Z"
-    },
-    {
-      "pattern": "10.10.10.0/24",
-      "action": "block",
-      "description": "Test rule - blocked subnet",
-      "source": "test"
     }
   ],
   "ollamaEndpoint": "http://localhost:11434",
