@@ -8,6 +8,15 @@
     "throttleScore": 55,
     "monitorScore": 30
   },
+  "email": {
+    "maxEmailsPerHour": 500,
+    "maxRecipientsPerEmail": 100,
+    "maxBCCPerEmail": 20,
+    "suspiciousNewIPEmailsPerHour": 50,
+    "newIPMultiplier": 2,
+    "adminTrustBonus": 30,
+    "maliciousRateWeight": 0
+  },
   "rulesFilePath": "",
   "importedRules": [],
   "rules": [
@@ -2900,7 +2909,7 @@
     "rulesThreshold": 5,
     "forceFullRetrainEvery": 24,
     "trainingStatus": "completed",
-    "lastTrainedAt": "2026-04-11T09:22:10.752Z",
+    "lastTrainedAt": "2026-04-18T08:24:54.144Z",
     "nextScheduledAt": null,
     "rulesChangedSinceLastTrain": 0
   },
