@@ -1,0 +1,20 @@
+I built an API abuse detector that learns from every attack using Hindsight agent memory
+How I used Hindsight to make my abuse detector remember every attack pattern
+I trained an ML model to detect API attacks, then added Hindsight so it learns from each one
+My API firewall now remembers every attacker and gets smarter over time
+I connected TensorFlow.js to Hindsight and got a detection engine that actually learns
+How I stopped building throwaway detection rules and started using agent memory
+I made my API security learn from attacks in production using Hindsight
+My abuse detector got 10x better when I added agent memory to track attacker history
+I built an API shield that learns from each attack and remembers repeat offenders
+How I gave my detection engine a long-term memory using Hindsight
+I used Hindsight to track attacker sessions across days and improve detection accuracy
+My API protection system now remembers attackers across sessions using agent memory
+I combined TensorFlow.js with Hindsight to build a self-improving abuse detector
+How I added persistent memory to my real-time abuse detection pipeline
+My ML-based API security now learns and improves after each attack
+I built an API firewall that uses Hindsight to remember and recognize attacker patterns
+How I connected my detection model to agent memory and got better over time
+I made my abuse detection system learn from past attacks using Hindsight
+My real-time API protection now has long-term memory and gets smarter
+I added agent memory to my API abuse detector and it started learning patterns

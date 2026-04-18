@@ -1,0 +1,86 @@
+[
+  {
+    "pattern": "user:known_ip",
+    "action": "allow",
+    "description": "User logging in from known IP - trusted",
+    "threshold": { "max_emails_per_hour": 500, "max_recipients_per_email": 100 }
+  },
+  {
+    "pattern": "user:new_ip",
+    "action": "monitor",
+    "description": "User logging in from new IP - requires monitoring",
+    "threshold": { "max_emails_per_hour": 100, "max_recipients_per_email": 50 }
+  },
+  {
+    "pattern": "rate:high_volume",
+    "action": "block",
+    "description": "User sending more than 500 emails per hour - potential spam",
+    "threshold": { "max_emails_per_hour": 500 }
+  },
+  {
+    "pattern": "rate:extreme_volume",
+    "action": "block",
+    "description": "User sending more than 1000 emails per hour - confirmed spam",
+    "threshold": { "max_emails_per_hour": 1000 }
+  },
+  {
+    "pattern": "recipient:mass_bcc",
+    "action": "monitor",
+    "description": "Mass BCC detected - potential spam/spread",
+    "threshold": { "max_bcc_per_email": 20 }
+  },
+  {
+    "pattern": "recipient:extreme_bcc",
+    "action": "block",
+    "description": "Extreme BCC count (50+) - confirmed malicious",
+    "threshold": { "max_bcc_per_email": 50 }
+  },
+  {
+    "pattern": "domain:suspicious",
+    "action": "block",
+    "description": "Suspicious sender domain - known spam source",
+    "threshold": null
+  },
+  {
+    "pattern": "domain:new_user",
+    "action": "monitor",
+    "description": "New user domain - monitor closely",
+    "threshold": { "max_emails_per_hour": 50 }
+  },
+  {
+    "pattern": "attachment:exe",
+    "action": "block",
+    "description": "Executable attachment - malware risk",
+    "threshold": null
+  },
+  {
+    "pattern": "attachment:script",
+    "action": "block",
+    "description": "Script attachment - malware risk",
+    "threshold": null
+  },
+  {
+    "pattern": "subject:spam_pattern",
+    "action": "monitor",
+    "description": "Known spam subject patterns",
+    "threshold": null
+  },
+  {
+    "pattern": "reply:mismatch",
+    "action": "monitor",
+    "description": "Reply-To doesn't match From - potential phishing",
+    "threshold": null
+  },
+  {
+    "pattern": "auth:failure_burst",
+    "action": "monitor",
+    "description": "Multiple auth failures in short period",
+    "threshold": { "max_failures_per_minute": 5 }
+  },
+  {
+    "pattern": "auth:failure_extreme",
+    "action": "block",
+    "description": "Excessive auth failures - account compromise attempt",
+    "threshold": { "max_failures_per_minute": 20 }
+  }
+]

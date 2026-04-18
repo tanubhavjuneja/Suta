@@ -1,0 +1,148 @@
+{
+  "patterns": [
+    {
+      "label": "normal",
+      "riskRange": [0, 20],
+      "count": 120,
+      "description": "Normal legitimate API traffic",
+      "generator": {
+        "requestCount": { "min": 2, "max": 15 },
+        "durationMs": { "min": 15000, "max": 120000 },
+        "avgIntervalMs": { "min": 2000, "max": 15000 },
+        "stdDevMs": { "min": 500, "max": 4000 },
+        "ipCount": { "min": 1, "max": 1 },
+        "userAgents": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/17.2",
+          "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+        ],
+        "authPattern": ["consistent_bearer", "consistent_bearer", "consistent_bearer", "no_auth"],
+        "headerCount": { "min": 10, "max": 16 },
+        "missingHeaders": [],
+        "bodyShapes": ["empty", "{ name, email }", "{ query }"]
+      }
+    },
+    {
+      "label": "credential_stuffing",
+      "riskRange": [70, 98],
+      "count": 80,
+      "description": "Automated login attempts with stolen credentials",
+      "generator": {
+        "requestCount": { "min": 100, "max": 800 },
+        "durationMs": { "min": 3000, "max": 30000 },
+        "avgIntervalMs": { "min": 20, "max": 80 },
+        "stdDevMs": { "min": 3, "max": 15 },
+        "ipCount": { "min": 1, "max": 3 },
+        "userAgents": [
+          "python-requests/2.31.0",
+          "python-requests/2.28.0",
+          "python-httpx/0.25.0",
+          "Go-http-client/2.0"
+        ],
+        "authPattern": ["intermittent_auth", "no_auth"],
+        "headerCount": { "min": 3, "max": 6 },
+        "missingHeaders": ["accept-language", "sec-ch-ua", "sec-ch-ua-platform", "sec-fetch-dest", "sec-fetch-mode"],
+        "bodyShapes": ["{ username, password }"],
+        "endpoints": ["POST /api/auth/login"]
+      }
+    },
+    {
+      "label": "data_scraping",
+      "riskRange": [55, 90],
+      "count": 80,
+      "description": "Large-scale data extraction from API endpoints",
+      "generator": {
+        "requestCount": { "min": 200, "max": 2000 },
+        "durationMs": { "min": 80, "max": 200 },
+        "avgIntervalMs": { "min": 80, "max": 200 },
+        "stdDevMs": { "min": 10, "max": 30 },
+        "ipCount": { "min": 1, "max": 2 },
+        "userAgents": [
+          "Mozilla/5.0 (compatible; DataBot/1.0)",
+          "python-requests/2.31.0",
+          "Scrapy/2.11.0"
+        ],
+        "authPattern": ["consistent_bearer"],
+        "headerCount": { "min": 4, "max": 8 },
+        "missingHeaders": ["sec-ch-ua", "sec-fetch-mode", "upgrade-insecure-requests"],
+        "bodyShapes": ["empty"],
+        "endpointPattern": "GET /api/users/{id}/profile"
+      }
+    },
+    {
+      "label": "enumeration",
+      "riskRange": [50, 85],
+      "count": 80,
+      "description": "Sequential probing to discover valid resource IDs",
+      "generator": {
+        "requestCount": { "min": 100, "max": 1000 },
+        "durationMs": { "min": 150, "max": 300 },
+        "avgIntervalMs": { "min": 150, "max": 300 },
+        "stdDevMs": { "min": 20, "max": 50 },
+        "ipCount": { "min": 1, "max": 4 },
+        "userAgents": [
+          "curl/8.4.0",
+          "wget/1.21",
+          "python-requests/2.31.0"
+        ],
+        "authPattern": ["no_auth"],
+        "headerCount": { "min": 2, "max": 5 },
+        "missingHeaders": ["accept-language", "sec-ch-ua", "sec-ch-ua-platform", "sec-fetch-dest", "sec-fetch-mode", "sec-fetch-site", "upgrade-insecure-requests", "cache-control"],
+        "bodyShapes": ["empty"],
+        "endpointPattern": "GET /api/users/{id}"
+      }
+    },
+    {
+      "label": "rate_limit_evasion",
+      "riskRange": [45, 80],
+      "count": 80,
+      "description": "Intentional timing to bypass rate limiting",
+      "generator": {
+        "requestCount": { "min": 200, "max": 500 },
+        "durationMs": { "min": 200000, "max": 500000 },
+        "avgIntervalMs": { "min": 980, "max": 1100 },
+        "stdDevMs": { "min": 20, "max": 60 },
+        "ipCount": { "min": 2, "max": 6 },
+        "userAgents": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0"
+        ],
+        "authPattern": ["mixed_auth_types"],
+        "headerCount": { "min": 10, "max": 14 },
+        "missingHeaders": [],
+        "bodyShapes": ["empty"],
+        "endpoints": ["GET /api/search", "GET /api/listings"]
+      }
+    },
+    {
+      "label": "brute_force",
+      "riskRange": [75, 99],
+      "count": 60,
+      "description": "Rapid-fire authentication attempts",
+      "generator": {
+        "requestCount": { "min": 500, "max": 2000 },
+        "durationMs": { "min": 5000, "max": 30000 },
+        "avgIntervalMs": { "min": 10, "max": 50 },
+        "stdDevMs": { "min": 2, "max": 10 },
+        "ipCount": { "min": 1, "max": 1 },
+        "userAgents": [
+          "python-requests/2.31.0",
+          "Go-http-client/2.0",
+          "curl/8.4.0"
+        ],
+        "authPattern": ["no_auth"],
+        "headerCount": { "min": 3, "max": 5 },
+        "missingHeaders": ["accept-language", "sec-ch-ua", "sec-ch-ua-platform", "sec-fetch-dest"],
+        "bodyShapes": ["{ password }", "{ username, password }"],
+        "endpoints": ["POST /api/auth/login", "POST /api/auth/reset", "POST /api/auth/verify"]
+      }
+    }
+  ],
+  "training": {
+    "epochs": 50,
+    "modelArchitecture": {
+      "embedDim": 64,
+      "numHeads": 4,
+      "ffDim": 32
+    }
+  }
+}

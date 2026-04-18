@@ -1,0 +1,46 @@
+{
+  "SQL_INJECTION": {
+    "keywords": ["union", "select", "' or 1=1", "drop table", "information_schema", "xp_cmdshell", "exec(", "benchmark(", "sleep(", "concat("],
+    "patterns": ["union\\s+select", "union\\s+all\\s+select", "'\\s+or\\s+'?1'?\\s*=\\s*'?1", ";\\s*drop\\s+table", ";\\s*delete\\s+from", "exec\\s*\\(", "benchmark\\s*\\(", "sleep\\s*\\("],
+    "severity": "critical",
+    "autoBlock": true
+  },
+  "XSS": {
+    "keywords": ["<script", "javascript:", "onerror=", "onload=", "onclick=", "alert(", "eval(", "<img", "<svg"],
+    "patterns": ["<script", "javascript:", "on(error|load|click)\\s*=", "<(img|svg)\\s+[^>]*on(error|load)"],
+    "severity": "critical",
+    "autoBlock": true
+  },
+  "PATH_TRAVERSAL": {
+    "keywords": ["../", "..%2f", "%2e%2e%2f", "etc/passwd", "windows/system32"],
+    "patterns": ["\\.\\.[\\/]", "\\.\\.%2f", "%2e%2e%2f", "etc[\\/]passwd", "windows[\\/]system32"],
+    "severity": "critical",
+    "autoBlock": true
+  },
+  "BRUTE_FORCE": {
+    "authEndpointThreshold": 5,
+    "endpoints": ["/auth/login", "/login", "/api/auth/login", "/auth/reset", "/auth/verify"],
+    "severity": "high"
+  },
+  "CREDENTIAL_STUFFING": {
+    "authHitsNoTokenThreshold": 3,
+    "authRatioThreshold": 0.6,
+    "severity": "high"
+  },
+  "DDOS": {
+    "rpsThreshold": 50,
+    "burstThreshold": 12,
+    "requestCountThreshold": 25,
+    "severity": "high"
+  },
+  "SCRAPING": {
+    "sequentialIdThreshold": 0.4,
+    "singleEndpointFocusRatio": 0.75,
+    "botUARequired": true,
+    "severity": "medium"
+  },
+  "ANOMALY": {
+    "description": "Fallback when behavioral score is high but no specific attack signature matches",
+    "severity": "medium"
+  }
+}

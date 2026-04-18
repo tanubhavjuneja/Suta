@@ -1,0 +1,2926 @@
+{
+  "port": 3000,
+  "hindsight": {
+    "baseUrl": "http://localhost:8888"
+  },
+  "enforcement": {
+    "blockScore": 80,
+    "throttleScore": 55,
+    "monitorScore": 30
+  },
+  "rulesFilePath": "",
+  "importedRules": [],
+  "rules": [
+    {
+      "id": "rule-1775879849978",
+      "pattern": "246.117.191.160",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(8x→+48), bot_ua(+15), endpoint_focus(100%→+18)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "246.117.191.160"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T03:57:29.978Z",
+      "updatedAt": "2026-04-11T03:57:29.978Z"
+    },
+    {
+      "id": "rule-1775879853542",
+      "pattern": "20.124.2.184",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(8x→+48), bot_ua(+15), endpoint_focus(100%→+18)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "20.124.2.184"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T03:57:33.542Z",
+      "updatedAt": "2026-04-11T03:57:33.542Z"
+    },
+    {
+      "id": "rule-1775880049734",
+      "pattern": "228.18.129.202",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "228.18.129.202"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T04:00:49.734Z",
+      "updatedAt": "2026-04-11T04:00:49.734Z"
+    },
+    {
+      "id": "rule-1775880050343",
+      "pattern": "78.221.172.5",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "78.221.172.5"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T04:00:50.343Z",
+      "updatedAt": "2026-04-11T04:00:50.343Z"
+    },
+    {
+      "id": "rule-1775880051511",
+      "pattern": "197.150.14.234",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "197.150.14.234"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:00:51.511Z",
+      "updatedAt": "2026-04-11T04:00:51.511Z"
+    },
+    {
+      "id": "rule-1775880052089",
+      "pattern": "220.61.248.148",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "220.61.248.148"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:00:52.089Z",
+      "updatedAt": "2026-04-11T04:00:52.089Z"
+    },
+    {
+      "id": "rule-1775880052884",
+      "pattern": "98.67.94.126",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "98.67.94.126"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:00:52.884Z",
+      "updatedAt": "2026-04-11T04:00:52.884Z"
+    },
+    {
+      "id": "rule-1775880063429",
+      "pattern": "89.188.21.121",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(15reqs→+14), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "89.188.21.121"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:01:03.429Z",
+      "updatedAt": "2026-04-11T04:01:03.429Z"
+    },
+    {
+      "id": "rule-1775880064569",
+      "pattern": "67.185.148.202",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(16reqs→+14), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "67.185.148.202"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:01:04.569Z",
+      "updatedAt": "2026-04-11T04:01:04.569Z"
+    },
+    {
+      "id": "rule-1775880066081",
+      "pattern": "39.185.129.68",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(17reqs→+15), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "39.185.129.68"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:01:06.081Z",
+      "updatedAt": "2026-04-11T04:01:06.081Z"
+    },
+    {
+      "id": "rule-1775880067118",
+      "pattern": "190.164.232.108",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(18reqs→+16), ip_rotation(11ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "190.164.232.108"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:01:07.118Z",
+      "updatedAt": "2026-04-11T04:01:07.118Z"
+    },
+    {
+      "id": "rule-1775880068796",
+      "pattern": "239.170.8.156",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.28→+12), high_volume(19reqs→+17), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "239.170.8.156"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:08.796Z",
+      "updatedAt": "2026-04-11T04:01:08.796Z"
+    },
+    {
+      "id": "rule-1775880071412",
+      "pattern": "9.74.159.81",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(8x→+48), bot_ua(+15), endpoint_focus(100%→+18)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "9.74.159.81"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T04:01:11.412Z",
+      "updatedAt": "2026-04-11T04:01:11.412Z"
+    },
+    {
+      "id": "rule-1775880071553",
+      "pattern": "51.233.173.214",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(95%→+21), high_volume(20reqs→+18), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "51.233.173.214"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T04:01:11.553Z",
+      "updatedAt": "2026-04-11T04:01:11.553Z"
+    },
+    {
+      "id": "rule-1775880072394",
+      "pattern": "250.128.72.158",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(9x→+54), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "250.128.72.158"
+      ],
+      "weight": 94,
+      "createdAt": "2026-04-11T04:01:12.394Z",
+      "updatedAt": "2026-04-11T04:01:12.394Z"
+    },
+    {
+      "id": "rule-1775880073172",
+      "pattern": "188.248.169.19",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(10x→+60), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "188.248.169.19"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:13.172Z",
+      "updatedAt": "2026-04-11T04:01:13.172Z"
+    },
+    {
+      "id": "rule-1775880073287",
+      "pattern": "168.109.222.237",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(95%→+21), high_volume(21reqs→+19), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "168.109.222.237"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:01:13.287Z",
+      "updatedAt": "2026-04-11T04:01:13.287Z"
+    },
+    {
+      "id": "rule-1775880075006",
+      "pattern": "201.181.69.174",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(95%→+21), low_variance(cv=0.27→+12), high_volume(22reqs→+20), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "201.181.69.174"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:15.006Z",
+      "updatedAt": "2026-04-11T04:01:15.006Z"
+    },
+    {
+      "id": "rule-1775880076225",
+      "pattern": "19.242.152.190",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(95%→+21), low_variance(cv=0.28→+12), high_volume(23reqs→+21), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "19.242.152.190"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:16.225Z",
+      "updatedAt": "2026-04-11T04:01:16.225Z"
+    },
+    {
+      "id": "rule-1775880077427",
+      "pattern": "133.96.26.145",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(96%→+21), low_variance(cv=0.29→+12), high_volume(24reqs→+22), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "133.96.26.145"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:17.427Z",
+      "updatedAt": "2026-04-11T04:01:17.427Z"
+    },
+    {
+      "id": "rule-1775880080355",
+      "pattern": "113.134.177.182",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(92%→+20), low_variance(cv=0.30→+12), high_volume(25reqs→+23), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "113.134.177.182"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:20.355Z",
+      "updatedAt": "2026-04-11T04:01:20.355Z"
+    },
+    {
+      "id": "rule-1775880081777",
+      "pattern": "99.252.200.47",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(92%→+20), low_variance(cv=0.30→+12), high_volume(26reqs→+23), ip_rotation(16ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "99.252.200.47"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:01:21.777Z",
+      "updatedAt": "2026-04-11T04:01:21.778Z"
+    },
+    {
+      "id": "rule-1775880085604",
+      "pattern": "120.21.185.143",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(88%→+19), high_volume(27reqs→+24), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "120.21.185.143"
+      ],
+      "weight": 94,
+      "createdAt": "2026-04-11T04:01:25.604Z",
+      "updatedAt": "2026-04-11T04:01:25.604Z"
+    },
+    {
+      "id": "rule-1775880087338",
+      "pattern": "101.237.109.28",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(89%→+20), high_volume(28reqs→+25), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "101.237.109.28"
+      ],
+      "weight": 96,
+      "createdAt": "2026-04-11T04:01:27.338Z",
+      "updatedAt": "2026-04-11T04:01:27.338Z"
+    },
+    {
+      "id": "rule-1775880092450",
+      "pattern": "9.23.166.87",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(86%→+19), high_volume(29reqs→+26), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "9.23.166.87"
+      ],
+      "weight": 96,
+      "createdAt": "2026-04-11T04:01:32.450Z",
+      "updatedAt": "2026-04-11T04:01:32.450Z"
+    },
+    {
+      "id": "rule-1775880097291",
+      "pattern": "251.187.172.177",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(83%→+18), high_volume(30reqs→+27), ip_rotation(18ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "251.187.172.177"
+      ],
+      "weight": 96,
+      "createdAt": "2026-04-11T04:01:37.291Z",
+      "updatedAt": "2026-04-11T04:01:37.291Z"
+    },
+    {
+      "id": "rule-1775880107583",
+      "pattern": "29.100.173.3",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(80%→+18), high_volume(31reqs→+28), ip_rotation(19ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "29.100.173.3"
+      ],
+      "weight": 97,
+      "createdAt": "2026-04-11T04:01:47.583Z",
+      "updatedAt": "2026-04-11T04:01:47.583Z"
+    },
+    {
+      "id": "rule-1775880215100",
+      "pattern": "228.66.141.99",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+30), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.17→+12), ip_rotation(3ips→+7)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "228.66.141.99"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:03:35.100Z",
+      "updatedAt": "2026-04-11T04:03:35.100Z"
+    },
+    {
+      "id": "rule-1775880216038",
+      "pattern": "37.93.144.28",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+36), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.18→+12), ip_rotation(3ips→+7)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "37.93.144.28"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:03:36.038Z",
+      "updatedAt": "2026-04-11T04:03:36.038Z"
+    },
+    {
+      "id": "rule-1775880216805",
+      "pattern": "197.114.42.4",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(25reqs→+23), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "197.114.42.4"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T04:03:36.805Z",
+      "updatedAt": "2026-04-11T04:03:36.805Z"
+    },
+    {
+      "id": "rule-1775880217747",
+      "pattern": "13.55.128.22",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(26reqs→+23), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "13.55.128.22"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T04:03:37.747Z",
+      "updatedAt": "2026-04-11T04:03:37.747Z"
+    },
+    {
+      "id": "rule-1775880218180",
+      "pattern": "249.61.16.74",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(27reqs→+24), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "249.61.16.74"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T04:03:38.180Z",
+      "updatedAt": "2026-04-11T04:03:38.180Z"
+    },
+    {
+      "id": "rule-1775880218690",
+      "pattern": "31.173.122.252",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(28reqs→+25), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "31.173.122.252"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:03:38.690Z",
+      "updatedAt": "2026-04-11T04:03:38.690Z"
+    },
+    {
+      "id": "rule-1775880219366",
+      "pattern": "150.105.149.219",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(29reqs→+26), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "150.105.149.219"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:03:39.366Z",
+      "updatedAt": "2026-04-11T04:03:39.366Z"
+    },
+    {
+      "id": "rule-1775880219816",
+      "pattern": "37.52.228.105",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(30reqs→+27), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "37.52.228.105"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:03:39.816Z",
+      "updatedAt": "2026-04-11T04:03:39.816Z"
+    },
+    {
+      "id": "rule-1775880220059",
+      "pattern": "215.226.172.118",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(7x→+42), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "215.226.172.118"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:03:40.059Z",
+      "updatedAt": "2026-04-11T04:03:40.059Z"
+    },
+    {
+      "id": "rule-1775880220340",
+      "pattern": "189.47.245.168",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(31reqs→+28), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "189.47.245.168"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:03:40.340Z",
+      "updatedAt": "2026-04-11T04:03:40.340Z"
+    },
+    {
+      "id": "rule-1775880220432",
+      "pattern": "62.140.181.198",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(32reqs→+29), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "62.140.181.198"
+      ],
+      "weight": 86,
+      "createdAt": "2026-04-11T04:03:40.432Z",
+      "updatedAt": "2026-04-11T04:03:40.432Z"
+    },
+    {
+      "id": "rule-1775880220943",
+      "pattern": "193.16.5.30",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(33reqs→+30), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "193.16.5.30"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:03:40.943Z",
+      "updatedAt": "2026-04-11T04:03:40.943Z"
+    },
+    {
+      "id": "rule-1775880221561",
+      "pattern": "35.34.17.5",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), endpoint_focus(100%→+18), high_volume(34reqs→+31), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "35.34.17.5"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:03:41.561Z",
+      "updatedAt": "2026-04-11T04:03:41.561Z"
+    },
+    {
+      "id": "rule-1775880229872",
+      "pattern": "25.125.101.174",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(32reqs→+29), ip_rotation(25ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "25.125.101.174"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T04:03:49.872Z",
+      "updatedAt": "2026-04-11T04:03:49.872Z"
+    },
+    {
+      "id": "rule-1775880230952",
+      "pattern": "198.196.153.20",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(8x→+48), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(4ips→+10)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "198.196.153.20"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:03:50.952Z",
+      "updatedAt": "2026-04-11T04:03:50.952Z"
+    },
+    {
+      "id": "rule-1775880231376",
+      "pattern": "234.14.200.162",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(33reqs→+30), ip_rotation(25ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "234.14.200.162"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T04:03:51.376Z",
+      "updatedAt": "2026-04-11T04:03:51.376Z"
+    },
+    {
+      "id": "rule-1775880231498",
+      "pattern": "131.190.67.22",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(34reqs→+31), ip_rotation(26ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "131.190.67.22"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:03:51.498Z",
+      "updatedAt": "2026-04-11T04:03:51.498Z"
+    },
+    {
+      "id": "rule-1775880231607",
+      "pattern": "114.122.202.170",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(9x→+54), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "114.122.202.170"
+      ],
+      "weight": 99,
+      "createdAt": "2026-04-11T04:03:51.607Z",
+      "updatedAt": "2026-04-11T04:03:51.607Z"
+    },
+    {
+      "id": "rule-1775880232141",
+      "pattern": "120.168.19.15",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(10x→+60), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(6ips→+14)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "120.168.19.15"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:03:52.141Z",
+      "updatedAt": "2026-04-11T04:03:52.141Z"
+    },
+    {
+      "id": "rule-1775880233009",
+      "pattern": "149.161.214.89",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(35reqs→+32), ip_rotation(27ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "149.161.214.89"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:03:53.009Z",
+      "updatedAt": "2026-04-11T04:03:53.009Z"
+    },
+    {
+      "id": "rule-1775880234511",
+      "pattern": "112.101.122.128",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(36reqs→+32), ip_rotation(27ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "112.101.122.128"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:03:54.511Z",
+      "updatedAt": "2026-04-11T04:03:54.511Z"
+    },
+    {
+      "id": "rule-1775880234604",
+      "pattern": "77.135.234.2",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(37reqs→+33), ip_rotation(27ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "77.135.234.2"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:03:54.604Z",
+      "updatedAt": "2026-04-11T04:03:54.604Z"
+    },
+    {
+      "id": "rule-1775880235695",
+      "pattern": "195.213.66.6",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(38reqs→+34), ip_rotation(28ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "195.213.66.6"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:03:55.695Z",
+      "updatedAt": "2026-04-11T04:03:55.695Z"
+    },
+    {
+      "id": "rule-1775880236611",
+      "pattern": "61.205.192.97",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(39reqs→+35), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "61.205.192.97"
+      ],
+      "weight": 86,
+      "createdAt": "2026-04-11T04:03:56.611Z",
+      "updatedAt": "2026-04-11T04:03:56.611Z"
+    },
+    {
+      "id": "rule-1775880237519",
+      "pattern": "173.8.248.207",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(40reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "173.8.248.207"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:03:57.519Z",
+      "updatedAt": "2026-04-11T04:03:57.519Z"
+    },
+    {
+      "id": "rule-1775880238232",
+      "pattern": "248.201.242.78",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(41reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "248.201.242.78"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:03:58.232Z",
+      "updatedAt": "2026-04-11T04:03:58.232Z"
+    },
+    {
+      "id": "rule-1775880239007",
+      "pattern": "160.151.61.33",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(42reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "160.151.61.33"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:03:59.007Z",
+      "updatedAt": "2026-04-11T04:03:59.007Z"
+    },
+    {
+      "id": "rule-1775880240059",
+      "pattern": "236.33.110.56",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(43reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "236.33.110.56"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:00.059Z",
+      "updatedAt": "2026-04-11T04:04:00.059Z"
+    },
+    {
+      "id": "rule-1775880240550",
+      "pattern": "243.56.98.205",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(44reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "243.56.98.205"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:00.550Z",
+      "updatedAt": "2026-04-11T04:04:00.550Z"
+    },
+    {
+      "id": "rule-1775880241310",
+      "pattern": "3.15.37.213",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(45reqs→+36), ip_rotation(29ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "3.15.37.213"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:01.310Z",
+      "updatedAt": "2026-04-11T04:04:01.310Z"
+    },
+    {
+      "id": "rule-1775880241861",
+      "pattern": "68.1.5.242",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(46reqs→+36), ip_rotation(30ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "68.1.5.242"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:01.861Z",
+      "updatedAt": "2026-04-11T04:04:01.861Z"
+    },
+    {
+      "id": "rule-1775880243212",
+      "pattern": "207.54.87.159",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(47reqs→+36), ip_rotation(30ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "207.54.87.159"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:03.212Z",
+      "updatedAt": "2026-04-11T04:04:03.212Z"
+    },
+    {
+      "id": "rule-1775880244456",
+      "pattern": "95.84.160.211",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(48reqs→+36), ip_rotation(30ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "95.84.160.211"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:04.456Z",
+      "updatedAt": "2026-04-11T04:04:04.456Z"
+    },
+    {
+      "id": "rule-1775880244639",
+      "pattern": "21.180.201.46",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(49reqs→+36), ip_rotation(31ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "21.180.201.46"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:04.639Z",
+      "updatedAt": "2026-04-11T04:04:04.639Z"
+    },
+    {
+      "id": "rule-1775880245524",
+      "pattern": "210.133.15.154",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(50reqs→+36), ip_rotation(31ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "210.133.15.154"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:05.524Z",
+      "updatedAt": "2026-04-11T04:04:05.524Z"
+    },
+    {
+      "id": "rule-1775880246387",
+      "pattern": "193.90.33.233",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(51reqs→+36), ip_rotation(32ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "193.90.33.233"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:06.387Z",
+      "updatedAt": "2026-04-11T04:04:06.387Z"
+    },
+    {
+      "id": "rule-1775880246875",
+      "pattern": "145.26.71.59",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(52reqs→+36), ip_rotation(33ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "145.26.71.59"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:06.875Z",
+      "updatedAt": "2026-04-11T04:04:06.875Z"
+    },
+    {
+      "id": "rule-1775880249817",
+      "pattern": "67.81.38.90",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(53reqs→+36), ip_rotation(33ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "67.81.38.90"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:09.817Z",
+      "updatedAt": "2026-04-11T04:04:09.817Z"
+    },
+    {
+      "id": "rule-1775880251032",
+      "pattern": "245.56.178.141",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(54reqs→+36), ip_rotation(34ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "245.56.178.141"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:11.032Z",
+      "updatedAt": "2026-04-11T04:04:11.032Z"
+    },
+    {
+      "id": "rule-1775880257982",
+      "pattern": "173.49.105.97",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(55reqs→+36), ip_rotation(34ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "173.49.105.97"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:17.982Z",
+      "updatedAt": "2026-04-11T04:04:17.982Z"
+    },
+    {
+      "id": "rule-1775880259857",
+      "pattern": "237.7.131.58",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(56reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "237.7.131.58"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:19.857Z",
+      "updatedAt": "2026-04-11T04:04:19.857Z"
+    },
+    {
+      "id": "rule-1775880261695",
+      "pattern": "73.56.223.245",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(57reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "73.56.223.245"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:21.695Z",
+      "updatedAt": "2026-04-11T04:04:21.695Z"
+    },
+    {
+      "id": "rule-1775880264401",
+      "pattern": "141.162.49.69",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(58reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "141.162.49.69"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:24.401Z",
+      "updatedAt": "2026-04-11T04:04:24.401Z"
+    },
+    {
+      "id": "rule-1775880265287",
+      "pattern": "163.175.48.153",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(59reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "163.175.48.153"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:25.287Z",
+      "updatedAt": "2026-04-11T04:04:25.287Z"
+    },
+    {
+      "id": "rule-1775880267525",
+      "pattern": "140.209.128.197",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(60reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "140.209.128.197"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:27.525Z",
+      "updatedAt": "2026-04-11T04:04:27.525Z"
+    },
+    {
+      "id": "rule-1775880268541",
+      "pattern": "228.32.117.52",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(61reqs→+36), ip_rotation(35ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "228.32.117.52"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:28.541Z",
+      "updatedAt": "2026-04-11T04:04:28.541Z"
+    },
+    {
+      "id": "rule-1775880272482",
+      "pattern": "232.78.174.48",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), high_volume(62reqs→+36), ip_rotation(36ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "232.78.174.48"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:04:32.482Z",
+      "updatedAt": "2026-04-11T04:04:32.482Z"
+    },
+    {
+      "id": "rule-1775882539574",
+      "pattern": "::1",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(4x→+40), bot_ua(+15), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "::1"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T04:42:19.574Z",
+      "updatedAt": "2026-04-11T04:42:19.574Z"
+    },
+    {
+      "id": "rule-1775882869498",
+      "pattern": "173.196.190.129",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "173.196.190.129"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:47:49.498Z",
+      "updatedAt": "2026-04-11T04:47:49.498Z"
+    },
+    {
+      "id": "rule-1775882870222",
+      "pattern": "11.201.155.1",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "11.201.155.1"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:47:50.222Z",
+      "updatedAt": "2026-04-11T04:47:50.222Z"
+    },
+    {
+      "id": "rule-1775882875448",
+      "pattern": "13.124.107.187",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(93%→+20), high_volume(15reqs→+14), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "13.124.107.187"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:47:55.448Z",
+      "updatedAt": "2026-04-11T04:47:55.448Z"
+    },
+    {
+      "id": "rule-1775882878278",
+      "pattern": "48.24.194.193",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(87%→+19), high_volume(16reqs→+14), ip_rotation(11ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "48.24.194.193"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:47:58.278Z",
+      "updatedAt": "2026-04-11T04:47:58.278Z"
+    },
+    {
+      "id": "rule-1775882879920",
+      "pattern": "42.123.112.229",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(88%→+19), high_volume(17reqs→+15), ip_rotation(11ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "42.123.112.229"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:47:59.920Z",
+      "updatedAt": "2026-04-11T04:47:59.920Z"
+    },
+    {
+      "id": "rule-1775882882909",
+      "pattern": "151.174.44.50",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(82%→+18), high_volume(18reqs→+16), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "151.174.44.50"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:48:02.909Z",
+      "updatedAt": "2026-04-11T04:48:02.909Z"
+    },
+    {
+      "id": "rule-1775882882960",
+      "pattern": "150.48.234.232",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(4x→+40), bot_ua(+15), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "150.48.234.232"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T04:48:02.960Z",
+      "updatedAt": "2026-04-11T04:48:02.960Z"
+    },
+    {
+      "id": "rule-1775882884410",
+      "pattern": "248.199.117.234",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.25→+12), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "248.199.117.234"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:48:04.410Z",
+      "updatedAt": "2026-04-11T04:48:04.410Z"
+    },
+    {
+      "id": "rule-1775882884671",
+      "pattern": "52.116.2.109",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(83%→+18), high_volume(19reqs→+17), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "52.116.2.109"
+      ],
+      "weight": 86,
+      "createdAt": "2026-04-11T04:48:04.671Z",
+      "updatedAt": "2026-04-11T04:48:04.671Z"
+    },
+    {
+      "id": "rule-1775882885044",
+      "pattern": "238.202.223.66",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+60), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "238.202.223.66"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:48:05.044Z",
+      "updatedAt": "2026-04-11T04:48:05.044Z"
+    },
+    {
+      "id": "rule-1775882886441",
+      "pattern": "94.116.178.247",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(84%→+19), high_volume(20reqs→+18), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "94.116.178.247"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:06.441Z",
+      "updatedAt": "2026-04-11T04:48:06.441Z"
+    },
+    {
+      "id": "rule-1775882889561",
+      "pattern": "188.118.167.211",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(80%→+18), high_volume(21reqs→+19), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "188.118.167.211"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:09.561Z",
+      "updatedAt": "2026-04-11T04:48:09.561Z"
+    },
+    {
+      "id": "rule-1775882891187",
+      "pattern": "86.13.142.227",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(81%→+18), high_volume(22reqs→+20), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "86.13.142.227"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:48:11.187Z",
+      "updatedAt": "2026-04-11T04:48:11.187Z"
+    },
+    {
+      "id": "rule-1775882894532",
+      "pattern": "207.179.152.184",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(77%→+17), high_volume(23reqs→+21), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "207.179.152.184"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:48:14.532Z",
+      "updatedAt": "2026-04-11T04:48:14.532Z"
+    },
+    {
+      "id": "rule-1775882899381",
+      "pattern": "99.33.211.154",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(74%→+16), high_volume(24reqs→+22), ip_rotation(16ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "99.33.211.154"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:48:19.381Z",
+      "updatedAt": "2026-04-11T04:48:19.381Z"
+    },
+    {
+      "id": "rule-1775882902242",
+      "pattern": "109.52.100.81",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "109.52.100.81"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:22.242Z",
+      "updatedAt": "2026-04-11T04:48:22.242Z"
+    },
+    {
+      "id": "rule-1775882902523",
+      "pattern": "40.14.106.126",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(71%→+16), high_volume(25reqs→+23), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "40.14.106.126"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T04:48:22.523Z",
+      "updatedAt": "2026-04-11T04:48:22.523Z"
+    },
+    {
+      "id": "rule-1775882903177",
+      "pattern": "42.91.121.91",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "42.91.121.91"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:23.177Z",
+      "updatedAt": "2026-04-11T04:48:23.177Z"
+    },
+    {
+      "id": "rule-1775882903368",
+      "pattern": "34.101.203.204",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "34.101.203.204"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:23.368Z",
+      "updatedAt": "2026-04-11T04:48:23.368Z"
+    },
+    {
+      "id": "rule-1775882904368",
+      "pattern": "48.166.66.239",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "48.166.66.239"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:24.368Z",
+      "updatedAt": "2026-04-11T04:48:24.368Z"
+    },
+    {
+      "id": "rule-1775882904462",
+      "pattern": "85.102.217.76",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "85.102.217.76"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:24.462Z",
+      "updatedAt": "2026-04-11T04:48:24.462Z"
+    },
+    {
+      "id": "rule-1775882905229",
+      "pattern": "213.120.114.46",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "213.120.114.46"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:25.229Z",
+      "updatedAt": "2026-04-11T04:48:25.229Z"
+    },
+    {
+      "id": "rule-1775882905315",
+      "pattern": "159.21.188.128",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "159.21.188.128"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:25.315Z",
+      "updatedAt": "2026-04-11T04:48:25.315Z"
+    },
+    {
+      "id": "rule-1775882906221",
+      "pattern": "91.6.45.194",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "91.6.45.194"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:26.221Z",
+      "updatedAt": "2026-04-11T04:48:26.221Z"
+    },
+    {
+      "id": "rule-1775882906245",
+      "pattern": "231.120.162.131",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "231.120.162.131"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:26.245Z",
+      "updatedAt": "2026-04-11T04:48:26.245Z"
+    },
+    {
+      "id": "rule-1775882907462",
+      "pattern": "233.233.183.66",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "233.233.183.66"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:27.462Z",
+      "updatedAt": "2026-04-11T04:48:27.462Z"
+    },
+    {
+      "id": "rule-1775882907591",
+      "pattern": "215.28.40.73",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "215.28.40.73"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:27.591Z",
+      "updatedAt": "2026-04-11T04:48:27.591Z"
+    },
+    {
+      "id": "rule-1775882908570",
+      "pattern": "87.85.83.77",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "87.85.83.77"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:28.570Z",
+      "updatedAt": "2026-04-11T04:48:28.570Z"
+    },
+    {
+      "id": "rule-1775882908868",
+      "pattern": "149.145.189.83",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(68%→+15), high_volume(26reqs→+23), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "149.145.189.83"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:48:28.868Z",
+      "updatedAt": "2026-04-11T04:48:28.868Z"
+    },
+    {
+      "id": "rule-1775882909099",
+      "pattern": "117.95.245.137",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "117.95.245.137"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:29.099Z",
+      "updatedAt": "2026-04-11T04:48:29.099Z"
+    },
+    {
+      "id": "rule-1775882909818",
+      "pattern": "112.107.15.211",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "112.107.15.211"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:29.818Z",
+      "updatedAt": "2026-04-11T04:48:29.818Z"
+    },
+    {
+      "id": "rule-1775882909989",
+      "pattern": "174.58.124.17",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "174.58.124.17"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:29.989Z",
+      "updatedAt": "2026-04-11T04:48:29.989Z"
+    },
+    {
+      "id": "rule-1775882910909",
+      "pattern": "215.226.214.209",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "215.226.214.209"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:30.909Z",
+      "updatedAt": "2026-04-11T04:48:30.909Z"
+    },
+    {
+      "id": "rule-1775882911191",
+      "pattern": "126.55.157.243",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "126.55.157.243"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:31.191Z",
+      "updatedAt": "2026-04-11T04:48:31.191Z"
+    },
+    {
+      "id": "rule-1775882912144",
+      "pattern": "140.159.8.39",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "140.159.8.39"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:32.144Z",
+      "updatedAt": "2026-04-11T04:48:32.144Z"
+    },
+    {
+      "id": "rule-1775882912541",
+      "pattern": "178.241.133.246",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "178.241.133.246"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:32.541Z",
+      "updatedAt": "2026-04-11T04:48:32.541Z"
+    },
+    {
+      "id": "rule-1775882913563",
+      "pattern": "213.150.105.247",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "213.150.105.247"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:48:33.563Z",
+      "updatedAt": "2026-04-11T04:48:33.563Z"
+    },
+    {
+      "id": "rule-1775882930487",
+      "pattern": "151.223.84.114",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(65%→+14), high_volume(27reqs→+24), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "151.223.84.114"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:48:50.487Z",
+      "updatedAt": "2026-04-11T04:48:50.487Z"
+    },
+    {
+      "id": "rule-1775882932186",
+      "pattern": "186.95.118.48",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(63%→+14), high_volume(28reqs→+25), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "186.95.118.48"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T04:48:52.186Z",
+      "updatedAt": "2026-04-11T04:48:52.186Z"
+    },
+    {
+      "id": "rule-1775883134251",
+      "pattern": "229.62.55.232",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), low_variance(cv=0.25→+12), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "229.62.55.232"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T04:52:14.251Z",
+      "updatedAt": "2026-04-11T04:52:14.251Z"
+    },
+    {
+      "id": "rule-1775883135143",
+      "pattern": "83.249.140.41",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), low_variance(cv=0.27→+12), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "83.249.140.41"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T04:52:15.143Z",
+      "updatedAt": "2026-04-11T04:52:15.143Z"
+    },
+    {
+      "id": "rule-1775883135843",
+      "pattern": "94.141.90.141",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "94.141.90.141"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T04:52:15.843Z",
+      "updatedAt": "2026-04-11T04:52:15.843Z"
+    },
+    {
+      "id": "rule-1775883136506",
+      "pattern": "164.44.66.196",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "164.44.66.196"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T04:52:16.506Z",
+      "updatedAt": "2026-04-11T04:52:16.506Z"
+    },
+    {
+      "id": "rule-1775883137234",
+      "pattern": "246.38.92.122",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "246.38.92.122"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T04:52:17.234Z",
+      "updatedAt": "2026-04-11T04:52:17.234Z"
+    },
+    {
+      "id": "rule-1775883142873",
+      "pattern": "140.55.44.216",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(15reqs→+14), ip_rotation(9ips→+22)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "140.55.44.216"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T04:52:22.873Z",
+      "updatedAt": "2026-04-11T04:52:22.873Z"
+    },
+    {
+      "id": "rule-1775883144766",
+      "pattern": "173.11.122.209",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(16reqs→+14), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "173.11.122.209"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T04:52:24.766Z",
+      "updatedAt": "2026-04-11T04:52:24.766Z"
+    },
+    {
+      "id": "rule-1775883146076",
+      "pattern": "200.105.210.177",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(17reqs→+15), ip_rotation(11ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "200.105.210.177"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:26.076Z",
+      "updatedAt": "2026-04-11T04:52:26.076Z"
+    },
+    {
+      "id": "rule-1775883146459",
+      "pattern": "182.233.84.62",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(4x→+40), bot_ua(+15), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "182.233.84.62"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T04:52:26.460Z",
+      "updatedAt": "2026-04-11T04:52:26.460Z"
+    },
+    {
+      "id": "rule-1775883147373",
+      "pattern": "4.63.82.14",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.25→+12), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "4.63.82.14"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:52:27.373Z",
+      "updatedAt": "2026-04-11T04:52:27.373Z"
+    },
+    {
+      "id": "rule-1775883147705",
+      "pattern": "74.40.128.141",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(18reqs→+16), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "74.40.128.141"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T04:52:27.705Z",
+      "updatedAt": "2026-04-11T04:52:27.705Z"
+    },
+    {
+      "id": "rule-1775883148296",
+      "pattern": "29.205.248.215",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+60), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.23→+12), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "29.205.248.215"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:52:28.296Z",
+      "updatedAt": "2026-04-11T04:52:28.296Z"
+    },
+    {
+      "id": "rule-1775883148926",
+      "pattern": "210.251.63.230",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), high_volume(19reqs→+17), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "210.251.63.230"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T04:52:28.926Z",
+      "updatedAt": "2026-04-11T04:52:28.926Z"
+    },
+    {
+      "id": "rule-1775883150333",
+      "pattern": "87.36.202.161",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.23→+12), high_volume(20reqs→+18), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "87.36.202.161"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T04:52:30.333Z",
+      "updatedAt": "2026-04-11T04:52:30.333Z"
+    },
+    {
+      "id": "rule-1775883153340",
+      "pattern": "163.197.24.80",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(95%→+21), high_volume(21reqs→+19), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "163.197.24.80"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:52:33.340Z",
+      "updatedAt": "2026-04-11T04:52:33.340Z"
+    },
+    {
+      "id": "rule-1775883158921",
+      "pattern": "118.151.182.246",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(90%→+20), high_volume(22reqs→+20), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "118.151.182.246"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:52:38.921Z",
+      "updatedAt": "2026-04-11T04:52:38.921Z"
+    },
+    {
+      "id": "rule-1775883162485",
+      "pattern": "173.97.201.229",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(86%→+19), high_volume(23reqs→+21), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "173.97.201.229"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:52:42.485Z",
+      "updatedAt": "2026-04-11T04:52:42.485Z"
+    },
+    {
+      "id": "rule-1775883166379",
+      "pattern": "196.147.86.150",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(83%→+18), high_volume(24reqs→+22), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "196.147.86.150"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:52:46.379Z",
+      "updatedAt": "2026-04-11T04:52:46.379Z"
+    },
+    {
+      "id": "rule-1775883168352",
+      "pattern": "67.243.215.228",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "67.243.215.228"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:48.352Z",
+      "updatedAt": "2026-04-11T04:52:48.352Z"
+    },
+    {
+      "id": "rule-1775883169472",
+      "pattern": "189.149.105.187",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "189.149.105.187"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:49.472Z",
+      "updatedAt": "2026-04-11T04:52:49.472Z"
+    },
+    {
+      "id": "rule-1775883169812",
+      "pattern": "52.110.4.244",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(79%→+17), high_volume(25reqs→+23), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "52.110.4.244"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T04:52:49.812Z",
+      "updatedAt": "2026-04-11T04:52:49.812Z"
+    },
+    {
+      "id": "rule-1775883170487",
+      "pattern": "160.164.131.244",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "160.164.131.244"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:50.487Z",
+      "updatedAt": "2026-04-11T04:52:50.487Z"
+    },
+    {
+      "id": "rule-1775883170575",
+      "pattern": "235.199.47.88",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "235.199.47.88"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:50.575Z",
+      "updatedAt": "2026-04-11T04:52:50.575Z"
+    },
+    {
+      "id": "rule-1775883171416",
+      "pattern": "103.219.51.162",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "103.219.51.162"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:51.416Z",
+      "updatedAt": "2026-04-11T04:52:51.416Z"
+    },
+    {
+      "id": "rule-1775883171785",
+      "pattern": "189.196.69.15",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(80%→+18), high_volume(26reqs→+23), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "189.196.69.15"
+      ],
+      "weight": 92,
+      "createdAt": "2026-04-11T04:52:51.785Z",
+      "updatedAt": "2026-04-11T04:52:51.785Z"
+    },
+    {
+      "id": "rule-1775883171812",
+      "pattern": "25.154.71.136",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "25.154.71.136"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:51.812Z",
+      "updatedAt": "2026-04-11T04:52:51.812Z"
+    },
+    {
+      "id": "rule-1775883172854",
+      "pattern": "43.84.169.47",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "43.84.169.47"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:52.854Z",
+      "updatedAt": "2026-04-11T04:52:52.854Z"
+    },
+    {
+      "id": "rule-1775883172871",
+      "pattern": "217.189.112.170",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "217.189.112.170"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:52.871Z",
+      "updatedAt": "2026-04-11T04:52:52.871Z"
+    },
+    {
+      "id": "rule-1775883173967",
+      "pattern": "26.166.82.238",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "26.166.82.238"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:53.967Z",
+      "updatedAt": "2026-04-11T04:52:53.967Z"
+    },
+    {
+      "id": "rule-1775883174051",
+      "pattern": "221.180.168.96",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "221.180.168.96"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:54.051Z",
+      "updatedAt": "2026-04-11T04:52:54.051Z"
+    },
+    {
+      "id": "rule-1775883175220",
+      "pattern": "79.20.93.32",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "79.20.93.32"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:55.220Z",
+      "updatedAt": "2026-04-11T04:52:55.220Z"
+    },
+    {
+      "id": "rule-1775883175540",
+      "pattern": "248.29.36.47",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "248.29.36.47"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:55.540Z",
+      "updatedAt": "2026-04-11T04:52:55.540Z"
+    },
+    {
+      "id": "rule-1775883176136",
+      "pattern": "234.72.189.172",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "234.72.189.172"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:56.136Z",
+      "updatedAt": "2026-04-11T04:52:56.136Z"
+    },
+    {
+      "id": "rule-1775883176740",
+      "pattern": "236.148.104.191",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "236.148.104.191"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:56.740Z",
+      "updatedAt": "2026-04-11T04:52:56.740Z"
+    },
+    {
+      "id": "rule-1775883177480",
+      "pattern": "62.3.97.213",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "62.3.97.213"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:57.480Z",
+      "updatedAt": "2026-04-11T04:52:57.480Z"
+    },
+    {
+      "id": "rule-1775883177580",
+      "pattern": "105.114.34.218",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "105.114.34.218"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:57.580Z",
+      "updatedAt": "2026-04-11T04:52:57.580Z"
+    },
+    {
+      "id": "rule-1775883178390",
+      "pattern": "199.146.54.246",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "199.146.54.246"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:58.390Z",
+      "updatedAt": "2026-04-11T04:52:58.390Z"
+    },
+    {
+      "id": "rule-1775883178896",
+      "pattern": "215.106.125.99",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "215.106.125.99"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T04:52:58.896Z",
+      "updatedAt": "2026-04-11T04:52:58.896Z"
+    },
+    {
+      "id": "rule-1775884581690",
+      "pattern": "45.33.32.156",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+60), bot_ua(+15), sparse_headers(avg=7.4→+12), endpoint_focus(86%→+18), ip_rotation(4ips→+10), cred_stuffing_noauth(86%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "45.33.32.156"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T05:16:21.690Z",
+      "updatedAt": "2026-04-11T05:16:21.690Z"
+    },
+    {
+      "id": "rule-1775884581719",
+      "pattern": "45.33.32.157",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(7x→+70), bot_ua(+15), sparse_headers(avg=7.1→+12), endpoint_focus(88%→+18), ip_rotation(5ips→+12), cred_stuffing_noauth(88%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "45.33.32.157"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T05:16:21.719Z",
+      "updatedAt": "2026-04-11T05:16:21.719Z"
+    },
+    {
+      "id": "rule-1775885252764",
+      "pattern": "82.68.24.2",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), low_variance(cv=0.26→+12), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "82.68.24.2"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T05:27:32.764Z",
+      "updatedAt": "2026-04-11T05:27:32.764Z"
+    },
+    {
+      "id": "rule-1775885253774",
+      "pattern": "25.95.109.193",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), low_variance(cv=0.28→+12), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "25.95.109.193"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T05:27:33.774Z",
+      "updatedAt": "2026-04-11T05:27:33.774Z"
+    },
+    {
+      "id": "rule-1775885254463",
+      "pattern": "168.31.188.230",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "168.31.188.230"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T05:27:34.463Z",
+      "updatedAt": "2026-04-11T05:27:34.463Z"
+    },
+    {
+      "id": "rule-1775885254960",
+      "pattern": "184.164.241.219",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "184.164.241.219"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T05:27:34.960Z",
+      "updatedAt": "2026-04-11T05:27:34.960Z"
+    },
+    {
+      "id": "rule-1775885255886",
+      "pattern": "75.230.197.232",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "75.230.197.232"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T05:27:35.886Z",
+      "updatedAt": "2026-04-11T05:27:35.886Z"
+    },
+    {
+      "id": "rule-1775885258261",
+      "pattern": "79.68.149.192",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.26→+12), high_volume(15reqs→+14), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "79.68.149.192"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T05:27:38.261Z",
+      "updatedAt": "2026-04-11T05:27:38.261Z"
+    },
+    {
+      "id": "rule-1775885259565",
+      "pattern": "149.146.135.197",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.27→+12), high_volume(16reqs→+14), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "149.146.135.197"
+      ],
+      "weight": 87,
+      "createdAt": "2026-04-11T05:27:39.565Z",
+      "updatedAt": "2026-04-11T05:27:39.565Z"
+    },
+    {
+      "id": "rule-1775885260952",
+      "pattern": "189.30.2.233",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.27→+12), high_volume(17reqs→+15), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "189.30.2.233"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:27:40.952Z",
+      "updatedAt": "2026-04-11T05:27:40.952Z"
+    },
+    {
+      "id": "rule-1775885262560",
+      "pattern": "224.185.117.153",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.27→+12), high_volume(18reqs→+16), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "224.185.117.153"
+      ],
+      "weight": 89,
+      "createdAt": "2026-04-11T05:27:42.560Z",
+      "updatedAt": "2026-04-11T05:27:42.560Z"
+    },
+    {
+      "id": "rule-1775885263552",
+      "pattern": "236.106.233.201",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(4x→+40), bot_ua(+15), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "236.106.233.201"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T05:27:43.552Z",
+      "updatedAt": "2026-04-11T05:27:43.552Z"
+    },
+    {
+      "id": "rule-1775885263628",
+      "pattern": "37.116.82.242",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.29→+12), high_volume(19reqs→+17), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "37.116.82.242"
+      ],
+      "weight": 90,
+      "createdAt": "2026-04-11T05:27:43.628Z",
+      "updatedAt": "2026-04-11T05:27:43.628Z"
+    },
+    {
+      "id": "rule-1775885264481",
+      "pattern": "198.2.159.41",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), bot_ua(+15), endpoint_focus(100%→+18), low_variance(cv=0.17→+12), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "198.2.159.41"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T05:27:44.481Z",
+      "updatedAt": "2026-04-11T05:27:44.481Z"
+    },
+    {
+      "id": "rule-1775885264866",
+      "pattern": "117.11.35.249",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.30→+12), high_volume(20reqs→+18), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "117.11.35.249"
+      ],
+      "weight": 91,
+      "createdAt": "2026-04-11T05:27:44.866Z",
+      "updatedAt": "2026-04-11T05:27:44.866Z"
+    },
+    {
+      "id": "rule-1775885266335",
+      "pattern": "119.66.217.111",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), low_variance(cv=0.29→+12), high_volume(21reqs→+19), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "119.66.217.111"
+      ],
+      "weight": 92,
+      "createdAt": "2026-04-11T05:27:46.335Z",
+      "updatedAt": "2026-04-11T05:27:46.335Z"
+    },
+    {
+      "id": "rule-1775885267383",
+      "pattern": "1.156.97.100",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+60), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "1.156.97.100"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T05:27:47.383Z",
+      "updatedAt": "2026-04-11T05:27:47.383Z"
+    },
+    {
+      "id": "rule-1775885267437",
+      "pattern": "229.109.178.97",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), high_volume(22reqs→+20), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "229.109.178.97"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T05:27:47.437Z",
+      "updatedAt": "2026-04-11T05:27:47.437Z"
+    },
+    {
+      "id": "rule-1775885268534",
+      "pattern": "210.163.237.131",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), high_volume(23reqs→+21), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "210.163.237.131"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T05:27:48.534Z",
+      "updatedAt": "2026-04-11T05:27:48.534Z"
+    },
+    {
+      "id": "rule-1775885272185",
+      "pattern": "250.50.123.21",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(24reqs→+22), ip_rotation(16ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "250.50.123.21"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T05:27:52.185Z",
+      "updatedAt": "2026-04-11T05:27:52.185Z"
+    },
+    {
+      "id": "rule-1775885274035",
+      "pattern": "98.81.92.122",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(25reqs→+23), ip_rotation(16ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "98.81.92.122"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T05:27:54.035Z",
+      "updatedAt": "2026-04-11T05:27:54.035Z"
+    },
+    {
+      "id": "rule-1775885275383",
+      "pattern": "168.106.120.129",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(26reqs→+23), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "168.106.120.129"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T05:27:55.383Z",
+      "updatedAt": "2026-04-11T05:27:55.383Z"
+    },
+    {
+      "id": "rule-1775885276733",
+      "pattern": "60.40.233.210",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(27reqs→+24), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "60.40.233.210"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T05:27:56.733Z",
+      "updatedAt": "2026-04-11T05:27:56.733Z"
+    },
+    {
+      "id": "rule-1775885277872",
+      "pattern": "210.126.153.168",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(28reqs→+25), ip_rotation(18ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "210.126.153.168"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T05:27:57.872Z",
+      "updatedAt": "2026-04-11T05:27:57.872Z"
+    },
+    {
+      "id": "rule-1775885279873",
+      "pattern": "243.149.141.133",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(29reqs→+26), ip_rotation(19ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "243.149.141.133"
+      ],
+      "weight": 86,
+      "createdAt": "2026-04-11T05:27:59.873Z",
+      "updatedAt": "2026-04-11T05:27:59.873Z"
+    },
+    {
+      "id": "rule-1775885287889",
+      "pattern": "132.81.48.183",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "132.81.48.183"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:28:07.889Z",
+      "updatedAt": "2026-04-11T05:28:07.889Z"
+    },
+    {
+      "id": "rule-1775885288909",
+      "pattern": "104.170.119.96",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "104.170.119.96"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:28:08.909Z",
+      "updatedAt": "2026-04-11T05:28:08.909Z"
+    },
+    {
+      "id": "rule-1775885288942",
+      "pattern": "236.12.72.184",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "236.12.72.184"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:28:08.942Z",
+      "updatedAt": "2026-04-11T05:28:08.942Z"
+    },
+    {
+      "id": "rule-1775885289809",
+      "pattern": "148.13.183.187",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "148.13.183.187"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:28:09.809Z",
+      "updatedAt": "2026-04-11T05:28:09.809Z"
+    },
+    {
+      "id": "rule-1775885289949",
+      "pattern": "20.67.175.236",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "20.67.175.236"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T05:28:09.949Z",
+      "updatedAt": "2026-04-11T05:28:09.949Z"
+    },
+    {
+      "id": "rule-1775891272056",
+      "pattern": "197.61.47.252",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "197.61.47.252"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T07:07:52.056Z",
+      "updatedAt": "2026-04-11T07:07:52.056Z"
+    },
+    {
+      "id": "rule-1775891272707",
+      "pattern": "161.248.35.222",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "161.248.35.222"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T07:07:52.707Z",
+      "updatedAt": "2026-04-11T07:07:52.707Z"
+    },
+    {
+      "id": "rule-1775891273333",
+      "pattern": "1.146.21.6",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "1.146.21.6"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T07:07:53.333Z",
+      "updatedAt": "2026-04-11T07:07:53.333Z"
+    },
+    {
+      "id": "rule-1775891274089",
+      "pattern": "191.97.4.93",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "191.97.4.93"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T07:07:54.089Z",
+      "updatedAt": "2026-04-11T07:07:54.089Z"
+    },
+    {
+      "id": "rule-1775891274744",
+      "pattern": "88.48.145.128",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "88.48.145.128"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T07:07:54.744Z",
+      "updatedAt": "2026-04-11T07:07:54.744Z"
+    },
+    {
+      "id": "rule-1775891289757",
+      "pattern": "151.146.15.254",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(4x→+40), bot_ua(+15), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "151.146.15.254"
+      ],
+      "weight": 93,
+      "createdAt": "2026-04-11T07:08:09.757Z",
+      "updatedAt": "2026-04-11T07:08:09.757Z"
+    },
+    {
+      "id": "rule-1775891291389",
+      "pattern": "47.217.175.77",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "47.217.175.77"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T07:08:11.389Z",
+      "updatedAt": "2026-04-11T07:08:11.389Z"
+    },
+    {
+      "id": "rule-1775891292098",
+      "pattern": "96.144.127.165",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(6x→+60), bot_ua(+15), endpoint_focus(100%→+18), ip_rotation(3ips→+7), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "96.144.127.165"
+      ],
+      "weight": 100,
+      "createdAt": "2026-04-11T07:08:12.098Z",
+      "updatedAt": "2026-04-11T07:08:12.098Z"
+    },
+    {
+      "id": "rule-1775891297852",
+      "pattern": "24.137.22.202",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), high_volume(21reqs→+19), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "24.137.22.202"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T07:08:17.852Z",
+      "updatedAt": "2026-04-11T07:08:17.852Z"
+    },
+    {
+      "id": "rule-1775891301639",
+      "pattern": "65.165.36.207",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(95%→+21), high_volume(22reqs→+20), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "65.165.36.207"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T07:08:21.639Z",
+      "updatedAt": "2026-04-11T07:08:21.639Z"
+    },
+    {
+      "id": "rule-1775891302736",
+      "pattern": "129.1.5.40",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(95%→+21), high_volume(23reqs→+21), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "129.1.5.40"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T07:08:22.736Z",
+      "updatedAt": "2026-04-11T07:08:22.736Z"
+    },
+    {
+      "id": "rule-1775891303907",
+      "pattern": "118.74.1.224",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(24reqs→+22), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "118.74.1.224"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T07:08:23.907Z",
+      "updatedAt": "2026-04-11T07:08:23.907Z"
+    },
+    {
+      "id": "rule-1775891304945",
+      "pattern": "238.108.100.43",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(25reqs→+23), ip_rotation(13ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "238.108.100.43"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T07:08:24.945Z",
+      "updatedAt": "2026-04-11T07:08:24.945Z"
+    },
+    {
+      "id": "rule-1775891306159",
+      "pattern": "114.24.227.190",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(96%→+21), high_volume(26reqs→+23), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "114.24.227.190"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T07:08:26.159Z",
+      "updatedAt": "2026-04-11T07:08:26.159Z"
+    },
+    {
+      "id": "rule-1775891308559",
+      "pattern": "91.200.81.190",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(92%→+20), high_volume(27reqs→+24), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "91.200.81.190"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T07:08:28.559Z",
+      "updatedAt": "2026-04-11T07:08:28.559Z"
+    },
+    {
+      "id": "rule-1775891309754",
+      "pattern": "35.226.180.106",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(93%→+20), high_volume(28reqs→+25), ip_rotation(14ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "35.226.180.106"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T07:08:29.754Z",
+      "updatedAt": "2026-04-11T07:08:29.754Z"
+    },
+    {
+      "id": "rule-1775891310118",
+      "pattern": "70.195.120.2",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "70.195.120.2"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:30.118Z",
+      "updatedAt": "2026-04-11T07:08:30.118Z"
+    },
+    {
+      "id": "rule-1775891311021",
+      "pattern": "162.73.229.60",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "162.73.229.60"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:31.021Z",
+      "updatedAt": "2026-04-11T07:08:31.021Z"
+    },
+    {
+      "id": "rule-1775891311321",
+      "pattern": "109.174.37.227",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(93%→+20), high_volume(29reqs→+26), ip_rotation(15ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "109.174.37.227"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T07:08:31.321Z",
+      "updatedAt": "2026-04-11T07:08:31.321Z"
+    },
+    {
+      "id": "rule-1775891311605",
+      "pattern": "122.149.46.1",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "122.149.46.1"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:31.605Z",
+      "updatedAt": "2026-04-11T07:08:31.605Z"
+    },
+    {
+      "id": "rule-1775891312121",
+      "pattern": "143.133.33.238",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "143.133.33.238"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:32.121Z",
+      "updatedAt": "2026-04-11T07:08:32.121Z"
+    },
+    {
+      "id": "rule-1775891312496",
+      "pattern": "121.244.232.178",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(93%→+20), high_volume(30reqs→+27), ip_rotation(16ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "121.244.232.178"
+      ],
+      "weight": 86,
+      "createdAt": "2026-04-11T07:08:32.496Z",
+      "updatedAt": "2026-04-11T07:08:32.496Z"
+    },
+    {
+      "id": "rule-1775891312559",
+      "pattern": "250.11.150.91",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "250.11.150.91"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:32.559Z",
+      "updatedAt": "2026-04-11T07:08:32.559Z"
+    },
+    {
+      "id": "rule-1775891313024",
+      "pattern": "40.15.67.106",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "40.15.67.106"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:33.024Z",
+      "updatedAt": "2026-04-11T07:08:33.024Z"
+    },
+    {
+      "id": "rule-1775891313954",
+      "pattern": "129.58.254.22",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(93%→+21), high_volume(31reqs→+28), ip_rotation(17ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "129.58.254.22"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:33.954Z",
+      "updatedAt": "2026-04-11T07:08:33.954Z"
+    },
+    {
+      "id": "rule-1775891314032",
+      "pattern": "240.188.198.241",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "240.188.198.241"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:34.032Z",
+      "updatedAt": "2026-04-11T07:08:34.032Z"
+    },
+    {
+      "id": "rule-1775891314107",
+      "pattern": "219.149.95.33",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: auth_repetition(5x→+50), endpoint_focus(100%→+18), cred_stuffing_noauth(100%→+20)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "219.149.95.33"
+      ],
+      "weight": 88,
+      "createdAt": "2026-04-11T07:08:34.107Z",
+      "updatedAt": "2026-04-11T07:08:34.107Z"
+    },
+    {
+      "id": "rule-1775898608999",
+      "pattern": "122.207.74.74",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(8ips→+19)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "122.207.74.74"
+      ],
+      "weight": 80,
+      "createdAt": "2026-04-11T09:10:08.999Z",
+      "updatedAt": "2026-04-11T09:10:08.999Z"
+    },
+    {
+      "id": "rule-1775898610846",
+      "pattern": "158.108.1.206",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.24→+12), ip_rotation(9ips→+22)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "158.108.1.206"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T09:10:10.846Z",
+      "updatedAt": "2026-04-11T09:10:10.846Z"
+    },
+    {
+      "id": "rule-1775898611371",
+      "pattern": "63.2.199.187",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(15reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "63.2.199.187"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T09:10:11.371Z",
+      "updatedAt": "2026-04-11T09:10:11.371Z"
+    },
+    {
+      "id": "rule-1775898611947",
+      "pattern": "21.215.163.97",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.27→+12), ip_rotation(9ips→+22)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "21.215.163.97"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T09:10:11.947Z",
+      "updatedAt": "2026-04-11T09:10:11.947Z"
+    },
+    {
+      "id": "rule-1775898612305",
+      "pattern": "20.69.105.116",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(16reqs→+14), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "20.69.105.116"
+      ],
+      "weight": 81,
+      "createdAt": "2026-04-11T09:10:12.305Z",
+      "updatedAt": "2026-04-11T09:10:12.305Z"
+    },
+    {
+      "id": "rule-1775898613048",
+      "pattern": "43.63.247.125",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(17reqs→+15), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "43.63.247.125"
+      ],
+      "weight": 82,
+      "createdAt": "2026-04-11T09:10:13.048Z",
+      "updatedAt": "2026-04-11T09:10:13.048Z"
+    },
+    {
+      "id": "rule-1775898613473",
+      "pattern": "111.253.9.205",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.27→+12), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "111.253.9.205"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T09:10:13.473Z",
+      "updatedAt": "2026-04-11T09:10:13.473Z"
+    },
+    {
+      "id": "rule-1775898614007",
+      "pattern": "245.159.53.87",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(18reqs→+16), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "245.159.53.87"
+      ],
+      "weight": 83,
+      "createdAt": "2026-04-11T09:10:14.007Z",
+      "updatedAt": "2026-04-11T09:10:14.007Z"
+    },
+    {
+      "id": "rule-1775898614875",
+      "pattern": "197.18.153.190",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sequential_ids(100%→+22), endpoint_focus(100%→+18), high_volume(19reqs→+17), ip_rotation(5ips→+12)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "197.18.153.190"
+      ],
+      "weight": 84,
+      "createdAt": "2026-04-11T09:10:14.875Z",
+      "updatedAt": "2026-04-11T09:10:14.875Z"
+    },
+    {
+      "id": "rule-1775898615382",
+      "pattern": "80.22.118.225",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(10ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "80.22.118.225"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T09:10:15.382Z",
+      "updatedAt": "2026-04-11T09:10:15.382Z"
+    },
+    {
+      "id": "rule-1775898616931",
+      "pattern": "42.123.15.72",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.25→+12), ip_rotation(11ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "42.123.15.72"
+      ],
+      "weight": 85,
+      "createdAt": "2026-04-11T09:10:16.931Z",
+      "updatedAt": "2026-04-11T09:10:16.931Z"
+    },
+    {
+      "id": "rule-1775898618080",
+      "pattern": "40.41.179.76",
+      "action": "block",
+      "description": "Auto-generated from blocked IP: bot_ua(+15), sparse_headers(avg=7.0→+12), sequential_ids(100%→+22), low_variance(cv=0.26→+12), high_volume(15reqs→+14), ip_rotation(12ips→+24)",
+      "source": "auto-generated",
+      "associatedIPs": [
+        "40.41.179.76"
+      ],
+      "weight": 99,
+      "createdAt": "2026-04-11T09:10:18.080Z",
+      "updatedAt": "2026-04-11T09:10:18.080Z"
+    },
+    {
+      "pattern": "10.10.10.0/24",
+      "action": "block",
+      "description": "Test rule - blocked subnet",
+      "source": "test"
+    }
+  ],
+  "ollamaEndpoint": "http://localhost:11434",
+  "ollamaModel": "llama3.2",
+  "logging": {
+    "maxDays": 7,
+    "maxSizeMB": 100,
+    "chunkSizeMB": 4
+  },
+  "training": {
+    "enabled": false,
+    "intervalHours": 1,
+    "useIncremental": true,
+    "enableRulesTrigger": false,
+    "rulesThreshold": 5,
+    "forceFullRetrainEvery": 24,
+    "trainingStatus": "completed",
+    "lastTrainedAt": "2026-04-11T09:22:10.752Z",
+    "nextScheduledAt": null,
+    "rulesChangedSinceLastTrain": 0
+  },
+  "ollama": {
+    "autoAnalyze": false,
+    "analyzeIntervalMinutes": 30,
+    "analysisStatus": "idle",
+    "lastAnalyzedAt": null
+  },
+  "_stats": {
+    "totalRequests": 0,
+    "allowed": 0,
+    "blocked": 0,
+    "blockedIPs": 0,
+    "activeActors": 0
+  }
+}
