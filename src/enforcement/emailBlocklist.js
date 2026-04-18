@@ -1,21 +1,26 @@
 // src/enforcement/emailBlocklist.js
 // ═══════════════════════════════════════════════════════════════
-// Email Server Blocklist — extends IPBlocklist for email-specific use
+// Email Server Blocklist — extends blocking for email-specific use
 //
-// Blocks email senders based on user, IP, domain, or combination.
-// Works alongside the existing IPBlocklist for HTTP requests.
-// ═══════════════════════════════════════════════════════════════
+// Blocks email senders based on user, IP, domain with admin trust support.
+// ═══════════════════════════════════════════════════════════════════════
+
+import userReputation from './userReputation.js';
 
 class EmailBlocklist {
   constructor() {
-    this.blockedUsers = new Map(); // userId → BlockEntry
-    this.blockedIPs = new Map(); // ip → BlockEntry
-    this.blockedDomains = new Map(); // domain → BlockEntry
-    this.monitoring = new Map(); // userId → MonitorEntry
-    this.defaultTTL = 15 * 60 * 1000; // 15 minutes
+    this.blockedUsers = new Map();
+    this.blockedIPs = new Map();
+    this.blockedDomains = new Map();
+    this.monitoring = new Map();
+    this.defaultTTL = 15 * 60 * 1000;
   }
 
   blockUser(userId, reason, score, ttlMs = this.defaultTTL) {
+    if (userReputation.isUserTrustedByAdmin(userId)) {
+      return { userId, action: 'ignored', reason: 'Admin trusted user' };
+    }
+
     const entry = {
       userId,
       reason,
@@ -25,10 +30,15 @@ class EmailBlocklist {
       expiresAtMs: Date.now() + ttlMs,
     };
     this.blockedUsers.set(userId, entry);
+    userReputation.recordMaliciousActivity(userId, score, reason);
     return entry;
   }
 
   blockIP(ip, userId, reason, score, ttlMs = this.defaultTTL) {
+    if (userReputation.isIPTrustedByAdmin(ip)) {
+      return { ip, action: 'ignored', reason: 'Admin trusted IP' };
+    }
+
     const entry = {
       ip,
       userId,
@@ -39,6 +49,9 @@ class EmailBlocklist {
       expiresAtMs: Date.now() + ttlMs,
     };
     this.blockedIPs.set(ip, entry);
+    if (userId) {
+      userReputation.recordMaliciousActivity(userId, score, `${reason} (IP: ${ip})`);
+    }
     return entry;
   }
 

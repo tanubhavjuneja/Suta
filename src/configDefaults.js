@@ -22,6 +22,15 @@ export function createDefaultConfig() {
       throttleScore: readIntEnv('THROTTLE_SCORE', 70),
       monitorScore: readIntEnv('MONITOR_SCORE', 40),
     },
+    email: {
+      maxEmailsPerHour: readIntEnv('MAX_EMAILS_PER_HOUR', 500),
+      maxRecipientsPerEmail: readIntEnv('MAX_RECIPIENTS_PER_EMAIL', 100),
+      maxBCCPerEmail: readIntEnv('MAX_BCC_PER_EMAIL', 20),
+      suspiciousNewIPEmailsPerHour: readIntEnv('SUSPICIOUS_NEW_IP_EMAILS_PER_HOUR', 50),
+      newIPMultiplier: readIntEnv('NEW_IP_MULTIPLIER', 2),
+      adminTrustBonus: readIntEnv('ADMIN_TRUST_BONUS', 30),
+      maliciousRateWeight: readIntEnv('MALICIOUS_RATE_WEIGHT', 0.5),
+    },
     rulesFilePath: process.env.RULES_FILE_PATH || '',
     importedRules: [],
     rules: [],
@@ -73,6 +82,10 @@ export function mergeConfig(saved = {}) {
     enforcement: {
       ...defaults.enforcement,
       ...(saved.enforcement || {}),
+    },
+    email: {
+      ...defaults.email,
+      ...(saved.email || {}),
     },
     importedRules: Array.isArray(saved.importedRules) ? saved.importedRules : defaults.importedRules,
     rules: Array.isArray(saved.rules) ? saved.rules : defaults.rules,
